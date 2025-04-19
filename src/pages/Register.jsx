@@ -1,7 +1,55 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import '../styles/styles.css';
 
 function Register() {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: '',
+    confirmPassword: ''
+  });
+
+  const handleChange = (e) => {
+    setFormData((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (formData.password !== formData.confirmPassword) {
+      alert('비밀번호가 일치하지 않습니다.');
+      return;
+    }
+
+    try {
+      const response = await fetch("http://13.209.5.228:8000/auth/signup", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          password: formData.password,
+        }),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        alert(data.message);
+        window.location.href = '/login';
+      } else {
+        alert(data.detail || '회원가입에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('서버 오류가 발생했습니다.');
+    }
+  };
+
   useEffect(() => {
     const toggle = document.querySelector('.menu-toggle');
     const navLinks = document.querySelector('.nav-links');
@@ -17,22 +65,22 @@ function Register() {
           <div className="auth-container">
             <div className="auth-form-container">
               <h2>회원가입</h2>
-              <form className="auth-form">
+              <form className="auth-form" onSubmit={handleSubmit}>
                 <div className="form-group">
                   <label htmlFor="name">이름</label>
-                  <input type="text" id="name" name="name" required />
+                  <input type="text" id="name" name="name" value={formData.name} onChange={handleChange} required />
                 </div>
                 <div className="form-group">
                   <label htmlFor="email">이메일</label>
-                  <input type="email" id="email" name="email" required />
+                  <input type="email" id="email" name="email" value={formData.email} onChange={handleChange} required />
                 </div>
                 <div className="form-group">
                   <label htmlFor="password">비밀번호</label>
-                  <input type="password" id="password" name="password" required />
+                  <input type="password" id="password" name="password" value={formData.password} onChange={handleChange} required />
                 </div>
                 <div className="form-group">
-                  <label htmlFor="confirm-password">비밀번호 확인</label>
-                  <input type="password" id="confirm-password" name="confirm-password" required />
+                  <label htmlFor="confirmPassword">비밀번호 확인</label>
+                  <input type="password" id="confirmPassword" name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} required />
                 </div>
                 <button type="submit" className="btn primary-btn full-width">회원가입</button>
               </form>

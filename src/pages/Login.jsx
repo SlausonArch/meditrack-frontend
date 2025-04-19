@@ -1,7 +1,9 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import '../styles/styles.css';
 
 function Login() {
+  const [formData, setFormData] = useState({ email: '', password: '' });
+
   useEffect(() => {
     const toggle = document.querySelector('.menu-toggle');
     const navLinks = document.querySelector('.nav-links');
@@ -10,6 +12,36 @@ function Login() {
     });
   }, []);
 
+  const handleLogin = async (e) => {
+    e.preventDefault();
+
+    try {
+      const response = await fetch("http://13.209.5.228:8000/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(formData)
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        alert(data.message);
+        localStorage.setItem("token", data.result.access_token);
+        localStorage.setItem("userName", data.result.name);  // 이름 저장
+        localStorage.setItem("userEmail", data.result.email); // 이메일 저장
+
+        window.location.href = "/"; //로그인 후 메인화면으로 이동
+      } else {
+        alert(data.message);
+      }
+    } catch (error) {
+      alert("서버 오류가 발생했습니다.");
+      console.error(error);
+    }
+  };
+
   return (
     <div>
       <section className="auth-section">
@@ -17,21 +49,28 @@ function Login() {
           <div className="auth-container">
             <div className="auth-form-container">
               <h2>로그인</h2>
-              <form className="auth-form">
+              <form className="auth-form" onSubmit={handleLogin}>
                 <div className="form-group">
                   <label htmlFor="email">이메일</label>
-                  <input type="email" id="email" name="email" required />
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    required
+                  />
                 </div>
                 <div className="form-group">
                   <label htmlFor="password">비밀번호</label>
-                  <input type="password" id="password" name="password" required />
-                </div>
-                <div className="form-options">
-                  <div className="remember-me">
-                    <input type="checkbox" id="remember" name="remember" />
-                    <label htmlFor="remember">로그인 상태 유지</label>
-                  </div>
-                  <a href="/forgot-password" className="forgot-password">비밀번호를 잊으셨나요?</a>
+                  <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    value={formData.password}
+                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                    required
+                  />
                 </div>
                 <button type="submit" className="btn primary-btn full-width">로그인</button>
               </form>
