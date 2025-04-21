@@ -88,12 +88,12 @@ function Register() {
                 <span>또는</span>
               </div>
               <div className="social-login">
-                <button className="btn social-btn kakao">
-                  <i className="fas fa-comment"></i> 카카오로 가입하기
-                </button>
-                <button className="btn social-btn naver">
-                  <i className="fas fa-n"></i> 네이버로 가입하기
-                </button>
+                <a
+                  className="btn social-btn kakao"
+                  href={`https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=a06920d44c605a26e1f58359e4309cc9&redirect_uri=http://13.209.5.228:8000/auth/kakao/callback`}
+                >
+                  <i className="fas fa-comment"></i> 카카오로 로그인
+                </a>
               </div>
               <div className="auth-footer">
                 <p>이미 계정이 있으신가요? <a href="/login">로그인</a></p>

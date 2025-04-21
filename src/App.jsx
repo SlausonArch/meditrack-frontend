@@ -11,12 +11,15 @@ import Layout from './components/Layout';
 import HeaderFooterLayout from './components/HeaderFooterLayout';
 import SidebarLayout from './components/SidebarkLayout';
 import '@fortawesome/fontawesome-free/css/all.min.css';
+import LoginSuccess from './pages/KaKaoRedirect';
 
 
 function App() {
   return (
     <Router>
       <Routes>
+        {/*카카오톡 로그인 라우팅 */}
+        <Route path="/login/success" element={<LoginSuccess />} /> 
         {/* Layout이 적용될 페이지들 헤더, 푸터, 사이드바 */}
 
 

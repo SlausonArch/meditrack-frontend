@@ -27,7 +27,7 @@ function Login() {
       const data = await response.json();
 
       if (response.ok) {
-        alert(data.message);
+        //  alert(data.message);
         localStorage.setItem("token", data.result.access_token);
         localStorage.setItem("userName", data.result.name);  // 이름 저장
         localStorage.setItem("userEmail", data.result.email); // 이메일 저장
@@ -78,12 +78,12 @@ function Login() {
                 <span>또는</span>
               </div>
               <div className="social-login">
-                <button className="btn social-btn kakao">
+                <a
+                  className="btn social-btn kakao"
+                  href={`https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=a06920d44c605a26e1f58359e4309cc9&redirect_uri=http://13.209.5.228:8000/auth/kakao/callback`}
+                >
                   <i className="fas fa-comment"></i> 카카오로 로그인
-                </button>
-                <button className="btn social-btn naver">
-                  <i className="fas fa-n"></i> 네이버로 로그인
-                </button>
+                </a>
               </div>
               <div className="auth-footer">
                 <p>계정이 없으신가요? <a href="/register">회원가입</a></p>
