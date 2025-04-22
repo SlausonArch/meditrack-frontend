@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react';
 import '../styles/styles.css';
 
 function Header() {
-  const [userName, setUserName] = useState(null);
-  const [userEmail, setUserEmail] = useState(null);
+  const [userName, setUserName] = useState(localStorage.getItem('userName'));
+  const [userEmail, setUserEmail] = useState(localStorage.getItem('userEmail'));
 
   useEffect(() => {
     const toggle = document.querySelector('.menu-toggle');
@@ -12,13 +12,21 @@ function Header() {
       navLinks.classList.toggle('active');
     });
 
-    // 로그인 상태 확인
-    const storedName = localStorage.getItem('userName');
-    const storedEmail = localStorage.getItem('userEmail');
-    if (storedEmail) {
-      setUserName(storedName || '사용자');
-      setUserEmail(storedEmail);
-    }
+    // localStorage 변경 감지
+    const handleStorageChange = () => {
+      setUserName(localStorage.getItem('userName'));
+      setUserEmail(localStorage.getItem('userEmail'));
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+
+    // 페이지 내부에서 localStorage 바뀌는 것도 감지하기 위해 interval 사용
+    const interval = setInterval(handleStorageChange, 500);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      clearInterval(interval);
+    };
   }, []);
 
   const handleLogout = () => {
@@ -44,7 +52,6 @@ function Header() {
           </ul>
         </nav>
 
-        {/* 로그인 여부에 따라 다른 UI */}
         {userEmail ? (
           <div className="auth-buttons">
             <span className="welcome-message">👋 {userName}님<br /><small>{userEmail}</small></span>
