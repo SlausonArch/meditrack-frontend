@@ -71,6 +71,54 @@ ul {
     height: 18px;
   }
   
+  /* 마이페이지 스타일 */
+  /* 나이와 성별 입력 필드 스타일 */
+.form-group {
+    margin-bottom: 20px;
+  }
+  
+  .gender-options {
+    display: flex;
+    justify-content: flex-start;
+    gap: 20px;
+  }
+  
+  .gender-option {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 16px;
+  }
+  
+  .gender-option input[type="radio"] {
+    accent-color: #4f46e5;
+    width: 18px;
+    height: 18px;
+  }
+  
+  /* 나이와 성별 필드가 한 줄로 나열되도록 수정 */
+  .form-group {
+    margin-bottom: 20px;
+  }
+  
+  input[type="number"],
+  input[type="password"],
+  input[type="text"],
+  input[type="email"] {
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 100%;
+    margin-top: 6px;
+  }
+  
+  /* 비밀번호 확인 교차검증 메시지 */
+  .error-text {
+    color: red;
+    font-size: 12px;
+    margin-top: 6px;
+  }
   
   
 
