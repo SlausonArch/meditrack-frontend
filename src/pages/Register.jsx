@@ -1,177 +1,162 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import '../styles/styles.css';
 
-function MyPage() {
-  const [currentPassword, setCurrentPassword] = useState('');
-  const [isPasswordValid, setIsPasswordValid] = useState(false); // 현재 비밀번호 확인 여부
+function Register() {
   const [formData, setFormData] = useState({
     name: '',
-    age: '',
-    gender: '',
-    newPassword: '',
+    email: '',
+    password: '',
     confirmPassword: '',
+    age: '',
+    gender: '', // "M" 또는 "F"
   });
-  const [isPasswordMatch, setIsPasswordMatch] = useState(true); // 비밀번호 확인 일치 여부
 
-  // 현재 비밀번호 입력 처리
-  const handleCurrentPasswordChange = (e) => {
-    setCurrentPassword(e.target.value);
-  };
-
-  // 정보 수정 필드 입력 처리
-  const handleFormChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
+  const handleChange = (e) => {
+    const { name, value, type } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === 'number' ? parseInt(value, 10) : value,
     }));
-
-    // 새 비밀번호와 확인 비밀번호 교차검증
-    if (name === 'newPassword' || name === 'confirmPassword') {
-      setIsPasswordMatch(formData.newPassword === formData.confirmPassword);
-    }
   };
 
-  // 현재 비밀번호 확인 처리
-  const handlePasswordSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // 비밀번호 확인 로직
-    if (currentPassword === 'abc123') {  // 실제 비밀번호로 교체해야 합니다.
-      setIsPasswordValid(true); // 비밀번호 확인 성공
-    } else {
+  
+    if (formData.password !== formData.confirmPassword) {
       alert('비밀번호가 일치하지 않습니다.');
-    }
-  };
-
-  // 정보 수정 처리 (서버로 전송 등)
-  const handleUpdateSubmit = (e) => {
-    e.preventDefault();
-    // 여기에 서버로 데이터 전송하는 로직 추가
-    if (!isPasswordMatch) {
-      alert('새 비밀번호와 확인 비밀번호가 일치하지 않습니다.');
       return;
     }
-
-    console.log('Updated Data:', formData);
-    alert('회원 정보가 수정되었습니다.');
+  
+    try {
+      const response = await fetch("http://13.209.5.228:8000/auth/signup", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          password: formData.password,
+          age: formData.age,
+          gender: formData.gender,
+        }),
+      });
+  
+      const data = await response.json();
+      if (response.ok) {
+        alert(data.message);  // 회원가입 성공 메시지
+        window.location.href = '/login';
+      } else {
+        // 서버에서 반환하는 message 필드를 사용
+        alert(data.message || '회원가입에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('서버 오류가 발생했습니다.');
+    }
   };
+  
+
+  useEffect(() => {
+    const toggle = document.querySelector('.menu-toggle');
+    const navLinks = document.querySelector('.nav-links');
+    toggle?.addEventListener('click', () => {
+      navLinks.classList.toggle('active');
+    });
+  }, []);
 
   return (
-    <div className="dashboard-layout">
-      <main className="main-content">
-        <div className="content-body">
-          <div className="card">
-            <div className="card-header">
-              <h3>회원 정보 수정</h3>
+    <div>
+      <section className="auth-section">
+        <div className="container">
+          <div className="auth-container">
+            <div className="auth-form-container">
+              <h2>회원가입</h2>
+              <form className="auth-form" onSubmit={handleSubmit}>
+                <div className="form-group">
+                  <label htmlFor="name">이름</label>
+                  <input type="text" id="name" name="name" value={formData.name} onChange={handleChange} required />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="email">이메일</label>
+                  <input type="email" id="email" name="email" value={formData.email} onChange={handleChange} required />
+                </div>
+                <div className="form-group-row">
+                <div className="form-group age-group">
+                  <label htmlFor="age">나이</label>
+                  <input
+                    type="number"
+                    id="age"
+                    name="age"
+                    value={formData.age}
+                    onChange={handleChange}
+                    required
+                    min="1"
+                    max="120"
+                  />
+                </div>
+
+                <div className="form-group gender-group">
+                  <label>성별</label>
+                  <div className="gender-options">
+                    <label className="gender-option">
+                      <input
+                        type="radio"
+                        name="gender"
+                        value="M"
+                        checked={formData.gender === "M"}
+                        onChange={handleChange}
+                        required
+                      />
+                      남자
+                    </label>
+                    <label className="gender-option">
+                      <input
+                        type="radio"
+                        name="gender"
+                        value="F"
+                        checked={formData.gender === "F"}
+                        onChange={handleChange}
+                        required
+                      />
+                      여자
+                    </label>
+                  </div>
+                </div>
+              </div>
+                <div className="form-group">
+                  <label htmlFor="password">비밀번호</label>
+                  <input type="password" id="password" name="password" value={formData.password} onChange={handleChange} required />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="confirmPassword">비밀번호 확인</label>
+                  <input type="password" id="confirmPassword" name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} required />
+                </div>
+                <button type="submit" className="btn primary-btn full-width">회원가입</button>
+              </form>
+              <div className="auth-divider">
+                <span>또는</span>
+              </div>
+              <div className="social-login">
+                <a
+                  className="btn social-btn kakao"
+                  href={`https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=a06920d44c605a26e1f58359e4309cc9&redirect_uri=http://13.209.5.228:8000/auth/kakao/callback`}
+                >
+                  <i className="fas fa-comment"></i> 카카오로 로그인
+                </a>
+              </div>
+              <div className="auth-footer">
+                <p>이미 계정이 있으신가요? <a href="/login">로그인</a></p>
+              </div>
             </div>
-            <div className="card-body">
-              {/* 현재 비밀번호 입력 폼 */}
-              {!isPasswordValid ? (
-                <form className="profile-form" onSubmit={handlePasswordSubmit}>
-                  <div className="form-group">
-                    <label htmlFor="currentPassword">현재 비밀번호</label>
-                    <input
-                      type="password"
-                      id="currentPassword"
-                      name="currentPassword"
-                      value={currentPassword}
-                      onChange={handleCurrentPasswordChange}
-                      required
-                    />
-                  </div>
-                  <button type="submit" className="btn primary-btn">
-                    비밀번호 확인
-                  </button>
-                </form>
-              ) : (
-                // 현재 비밀번호가 맞으면 정보 수정 폼 표시
-                <form className="profile-form" onSubmit={handleUpdateSubmit}>
-                  <div className="form-group">
-                    <label htmlFor="name">이름</label>
-                    <input
-                      type="text"
-                      id="name"
-                      name="name"
-                      value={formData.name}
-                      onChange={handleFormChange}
-                      required
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label htmlFor="age">나이</label>
-                    <input
-                      type="number"
-                      id="age"
-                      name="age"
-                      value={formData.age}
-                      onChange={handleFormChange}
-                      required
-                      min="1"
-                      max="120"
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>성별</label>
-                    <div className="gender-options">
-                      <label className="gender-option">
-                        <input
-                          type="radio"
-                          name="gender"
-                          value="M"
-                          checked={formData.gender === "M"}
-                          onChange={handleFormChange}
-                          required
-                        />
-                        남자
-                      </label>
-                      <label className="gender-option">
-                        <input
-                          type="radio"
-                          name="gender"
-                          value="F"
-                          checked={formData.gender === "F"}
-                          onChange={handleFormChange}
-                          required
-                        />
-                        여자
-                      </label>
-                    </div>
-                  </div>
-                  <div className="form-group">
-                    <label htmlFor="newPassword">새 비밀번호</label>
-                    <input
-                      type="password"
-                      id="newPassword"
-                      name="newPassword"
-                      value={formData.newPassword}
-                      onChange={handleFormChange}
-                      placeholder="새 비밀번호 입력"
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label htmlFor="confirmPassword">새 비밀번호 확인</label>
-                    <input
-                      type="password"
-                      id="confirmPassword"
-                      name="confirmPassword"
-                      value={formData.confirmPassword}
-                      onChange={handleFormChange}
-                      placeholder="새 비밀번호 확인"
-                    />
-                    {!isPasswordMatch && <p className="error-text">비밀번호가 일치하지 않습니다.</p>}
-                  </div>
-                  <button type="submit" className="btn primary-btn">
-                    정보 수정
-                  </button>
-                </form>
-              )}
+            <div className="auth-image">
+              <img src="https://placehold.co/500x600" alt="회원가입 이미지" />
             </div>
           </div>
         </div>
-      </main>
+      </section>
     </div>
   );
 }
 
-export default MyPage;
+export default Register;
