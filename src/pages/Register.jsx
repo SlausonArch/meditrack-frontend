@@ -6,13 +6,16 @@ function Register() {
     name: '',
     email: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
+    age: '',
+    gender: '', // "M" 또는 "F"
   });
 
   const handleChange = (e) => {
+    const { name, value, type } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [e.target.name]: e.target.value,
+      [name]: type === 'number' ? parseInt(value, 10) : value,
     }));
   };
 
@@ -34,6 +37,8 @@ function Register() {
           name: formData.name,
           email: formData.email,
           password: formData.password,
+          age: formData.age,
+          gender: formData.gender,
         }),
       });
 
@@ -74,6 +79,49 @@ function Register() {
                   <label htmlFor="email">이메일</label>
                   <input type="email" id="email" name="email" value={formData.email} onChange={handleChange} required />
                 </div>
+                <div className="form-group-row">
+                <div className="form-group age-group">
+                  <label htmlFor="age">나이</label>
+                  <input
+                    type="number"
+                    id="age"
+                    name="age"
+                    value={formData.age}
+                    onChange={handleChange}
+                    required
+                    min="1"
+                    max="120"
+                  />
+                </div>
+
+                <div className="form-group gender-group">
+                  <label>성별</label>
+                  <div className="gender-options">
+                    <label className="gender-option">
+                      <input
+                        type="radio"
+                        name="gender"
+                        value="M"
+                        checked={formData.gender === "M"}
+                        onChange={handleChange}
+                        required
+                      />
+                      남자
+                    </label>
+                    <label className="gender-option">
+                      <input
+                        type="radio"
+                        name="gender"
+                        value="F"
+                        checked={formData.gender === "F"}
+                        onChange={handleChange}
+                        required
+                      />
+                      여자
+                    </label>
+                  </div>
+                </div>
+              </div>
                 <div className="form-group">
                   <label htmlFor="password">비밀번호</label>
                   <input type="password" id="password" name="password" value={formData.password} onChange={handleChange} required />

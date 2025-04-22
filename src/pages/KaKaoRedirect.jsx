@@ -16,7 +16,7 @@ function LoginSuccess() {
       if (name) localStorage.setItem("userName", name);
       if (email) localStorage.setItem("userEmail", email);
 
-      alert("소셜 로그인 성공!");
+      //alert("소셜 로그인 성공!");
       navigate("/");
     } else {
       alert("소셜 로그인에 실패했습니다.");
