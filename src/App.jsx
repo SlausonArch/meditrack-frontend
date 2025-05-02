@@ -7,30 +7,72 @@ import OtcMeds from './pages/OtcMeds';
 import InteractionCheck from './pages/InteractionCheck';
 import Lens from './pages/Lens';
 import MyPage from './pages/MyPage';
-import Layout from './components/Layout'; 
 import HeaderFooterLayout from './components/HeaderFooterLayout';
 import SidebarLayout from './components/SidebarkLayout';
-import '@fortawesome/fontawesome-free/css/all.min.css';
 import LoginSuccess from './pages/KaKaoRedirect';
-
+import ProtectedRoute from './components/ProtectedRoute';
+import '@fortawesome/fontawesome-free/css/all.min.css';
+import Dashboard from './pages/Dashboard';
 
 function App() {
   return (
     <Router>
       <Routes>
-        {/*카카오톡 로그인 라우팅 */}
-        <Route path="/login/success" element={<LoginSuccess />} /> 
-        {/* Layout이 적용될 페이지들 헤더, 푸터, 사이드바 */}
+        {/* 카카오 로그인 콜백 */}
+        <Route path="/login/success" element={<LoginSuccess />} />
 
+        {/* 보호된 경로들 (SidebarLayout + 로그인 검사) */}
+        <Route
+          path="/otc-meds"
+          element={
+            <ProtectedRoute>
+              <SidebarLayout><OtcMeds /></SidebarLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/symptom-search"
+          element={
+            <ProtectedRoute>
+              <SidebarLayout><SymptomSearch /></SidebarLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/mypage"
+          element={
+            <ProtectedRoute>
+              <SidebarLayout><MyPage /></SidebarLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/interaction-check"
+          element={
+            <ProtectedRoute>
+              <SidebarLayout><InteractionCheck /></SidebarLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/lens"
+          element={
+            <ProtectedRoute>
+              <SidebarLayout><Lens /></SidebarLayout>
+            </ProtectedRoute>
+          }
+        />
 
-        {/*사이드바만 있는 레이아웃 */}
-        <Route path="/otc-meds" element={<SidebarLayout><OtcMeds /></SidebarLayout>} />
-        <Route path="/symptom-search" element={<SidebarLayout><SymptomSearch /></SidebarLayout>} />
-        <Route path="/mypage" element={<SidebarLayout><MyPage /></SidebarLayout>} />
-        <Route path="/interaction-check" element={<SidebarLayout><InteractionCheck /></SidebarLayout>} />
-        <Route path="/lens" element={<SidebarLayout><Lens /></SidebarLayout>} />
-     
-        {/*사이드바 없이 헤더푸터만 */}
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <SidebarLayout><Dashboard /></SidebarLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* 공개 경로들 (Header + Footer만 있음) */}
         <Route path="/" element={<HeaderFooterLayout><HomePage /></HeaderFooterLayout>} />
         <Route path="/login" element={<HeaderFooterLayout><Login /></HeaderFooterLayout>} />
         <Route path="/register" element={<HeaderFooterLayout><Register /></HeaderFooterLayout>} />

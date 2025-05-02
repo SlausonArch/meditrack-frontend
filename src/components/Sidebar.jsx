@@ -1,6 +1,9 @@
 import '../styles/styles.css';
 
 function Sidebar() {
+  const userName = localStorage.getItem("userName") || "사용자";
+  const userEmail = localStorage.getItem("userEmail") || "example@example.com";
+
   return (
     <aside className="sidebar">
       <div className="sidebar-header">
@@ -15,8 +18,8 @@ function Sidebar() {
         <div className="user-avatar">
           <img src="https://placehold.co/100" alt="사용자 프로필" />
         </div>
-        <h3 className="user-name">홍길동님</h3>
-        <p className="user-email">hong@example.com</p>
+        <h3 className="user-name">{userName}님</h3>
+        <p className="user-email">{userEmail}</p>
       </div>
       <nav className="sidebar-nav">
         <ul>
