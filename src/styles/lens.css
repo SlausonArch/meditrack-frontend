@@ -1,0 +1,296 @@
+/* 검색 관련 스타일 */
+.search-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .search-input-wrapper {
+    display: flex;
+    width: 100%;
+  }
+  
+  .search-input {
+    flex: 1;
+    padding: 12px 16px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px 0 0 8px;
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  
+  .search-input:focus {
+    border-color: #4299e1;
+    box-shadow: 0 0 0 2px rgba(66, 153, 225, 0.2);
+  }
+  
+  .search-button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 20px;
+    background-color: #4299e1;
+    color: white;
+    border: none;
+    border-radius: 0 8px 8px 0;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .search-button:hover {
+    background-color: #3182ce;
+  }
+  
+  .search-button:disabled {
+    background-color: #a0aec0;
+    cursor: not-allowed;
+  }
+  
+  .search-options {
+    display: flex;
+    gap: 16px;
+    margin-top: 4px;
+  }
+  
+  .search-option {
+    font-size: 0.875rem;
+    color: #718096;
+    cursor: pointer;
+    padding-bottom: 2px;
+    transition: color 0.2s;
+  }
+  
+  .search-option:hover {
+    color: #4299e1;
+  }
+  
+  .search-option.active {
+    color: #4299e1;
+    border-bottom: 2px solid #4299e1;
+    font-weight: 500;
+  }
+  
+  /* 검색 결과 스타일 */
+  .search-results {
+    margin-top: 20px;
+  }
+  
+  .result-count {
+    font-size: 0.875rem;
+    color: #718096;
+  }
+  
+  .medication-item {
+    display: flex;
+    padding: 16px 0;
+    border-bottom: 1px solid #edf2f7;
+  }
+  
+  .medication-item:last-child {
+    border-bottom: none;
+  }
+  
+  .medication-image {
+    width: 80px;
+    height: 80px;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-right: 16px;
+    flex-shrink: 0;
+  }
+  
+  .medication-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .medication-info {
+    flex: 1;
+  }
+  
+  .medication-info h4 {
+    font-size: 1.1rem;
+    margin: 0 0 8px 0;
+    color: #2d3748;
+  }
+  
+  .medication-info .manufacturer {
+    font-size: 0.875rem;
+    color: #718096;
+    margin: 0 0 8px 0;
+  }
+  
+  .medication-info .efficacy {
+    font-size: 0.875rem;
+    color: #4a5568;
+    margin: 0;
+    line-height: 1.5;
+  }
+  
+  .medication-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    justify-content: center;
+    margin-left: 16px;
+  }
+  
+  /* 모달 스타일 */
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  .modal-container {
+    background-color: white;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 800px;
+    max-height: 90vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  }
+  
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    border-bottom: 1px solid #edf2f7;
+  }
+  
+  .modal-header h3 {
+    margin: 0;
+    font-size: 1.25rem;
+    color: #2d3748;
+  }
+  
+  .modal-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #718096;
+  }
+  
+  .modal-body {
+    padding: 24px;
+    overflow-y: auto;
+    max-height: calc(90vh - 130px);
+  }
+  
+  .modal-footer {
+    padding: 16px 24px;
+    border-top: 1px solid #edf2f7;
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+  }
+  
+  .medication-detail {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+  
+  .medication-detail-image {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 16px;
+  }
+  
+  .medication-detail-image img {
+    max-width: 200px;
+    max-height: 200px;
+    object-fit: contain;
+  }
+  
+  .medication-detail-info {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .detail-section {
+    margin-bottom: 16px;
+  }
+  
+  .detail-section h4 {
+    font-size: 1rem;
+    color: #2d3748;
+    margin: 0 0 8px 0;
+    font-weight: 600;
+  }
+  
+  .detail-section p {
+    font-size: 0.875rem;
+    color: #4a5568;
+    margin: 0;
+    line-height: 1.6;
+    white-space: pre-line;
+  }
+  
+  /* 버튼 스타일 추가 */
+  .outline-btn {
+    background-color: white;
+    color: #4299e1;
+    border: 1px solid #4299e1;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .outline-btn:hover {
+    background-color: #ebf8ff;
+  }
+  
+  /* 반응형 스타일 */
+  @media (min-width: 768px) {
+    .medication-detail {
+      flex-direction: row;
+      align-items: flex-start;
+    }
+  
+    .medication-detail-image {
+      width: 200px;
+      margin-right: 24px;
+      margin-bottom: 0;
+    }
+  
+    .medication-detail-info {
+      flex: 1;
+    }
+  }
+  
+  @media (max-width: 640px) {
+    .medication-item {
+      flex-direction: column;
+    }
+  
+    .medication-image {
+      width: 100%;
+      height: 200px;
+      margin-right: 0;
+      margin-bottom: 16px;
+    }
+  
+    .medication-actions {
+      flex-direction: row;
+      margin-left: 0;
+      margin-top: 16px;
+    }
+  }
+  
