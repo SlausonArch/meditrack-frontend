@@ -11,8 +11,10 @@ import HeaderFooterLayout from './components/HeaderFooterLayout';
 import SidebarLayout from './components/SidebarkLayout';
 import LoginSuccess from './pages/KaKaoRedirect';
 import ProtectedRoute from './components/ProtectedRoute';
-import '@fortawesome/fontawesome-free/css/all.min.css';
 import Dashboard from './pages/Dashboard';
+import { MedicationProvider } from './context/medication-context'; // 이 경로는 실제 context 파일 경로에 맞게 수정하세요
+
+import '@fortawesome/fontawesome-free/css/all.min.css';
 
 function App() {
   return (
@@ -50,7 +52,9 @@ function App() {
           path="/interaction-check"
           element={
             <ProtectedRoute>
-              <SidebarLayout><InteractionCheck /></SidebarLayout>
+              <MedicationProvider>
+                <SidebarLayout><InteractionCheck /></SidebarLayout>
+              </MedicationProvider>
             </ProtectedRoute>
           }
         />
@@ -67,7 +71,9 @@ function App() {
           path="/dashboard"
           element={
             <ProtectedRoute>
-              <SidebarLayout><Dashboard /></SidebarLayout>
+              <MedicationProvider>
+                <SidebarLayout><Dashboard /></SidebarLayout>
+              </MedicationProvider>
             </ProtectedRoute>
           }
         />

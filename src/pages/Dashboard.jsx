@@ -4,20 +4,14 @@ import { useEffect, useState, useRef } from "react"
 import api from "../api" // api.js에서 axios 인스턴스 가져오기
 import "../styles/dashboard.css"
 import CustomAlert from "./custom-alert"
+import { useMedication } from "../context/medication-context"
 
 function Dashboard() {
   // 기저질환 관련 상태
   const [diseases, setDiseases] = useState([]) // 기존 기저질환 목록을 저장
   const [conditionList, setConditionList] = useState([]) // 서버에서 가져온 기저질환 목록
   const [isAddingDisease, setIsAddingDisease] = useState(false) // 기저질환 추가 모드 여부
-  
-  // 복용약 관련 상태
-  const [medications, setMedications] = useState([]) // 사용자의 현재 복용약 목록
-  const [searchKeyword, setSearchKeyword] = useState("") // 약물 검색어
-  const [searchResults, setSearchResults] = useState([]) // 검색 결과
-  const [isSearching, setIsSearching] = useState(false) // 검색 중 여부
-  const [showSearchResults, setShowSearchResults] = useState(false) // 검색 결과 표시 여부
-  
+
   // 공통 상태
   const [isLoading, setIsLoading] = useState(false) // 로딩 상태
   const [alertState, setAlertState] = useState({
@@ -25,37 +19,35 @@ function Dashboard() {
     title: "",
     message: "",
     itemId: null,
-    type: "" // "disease" 또는 "medication"
+    type: "", // "disease" 또는 "medication"
   })
-  
+
+  // 약품 관련 컨텍스트에서 가져오기
+  const {
+    medications,
+    searchKeyword,
+    searchResults,
+    isSearching,
+    showSearchResults,
+    setSearchKeyword,
+    setShowSearchResults,
+    addMedication,
+    deleteMedication,
+  } = useMedication()
+
   const searchInputRef = useRef(null)
   const searchResultsRef = useRef(null)
 
-  // 컴포넌트가 마운트될 때 기존 기저질환과 복용약 가져오기
+  // 컴포넌트가 마운트될 때 기존 기저질환 가져오기
   useEffect(() => {
     fetchDiseases()
-    fetchMedications()
   }, [])
-  
-  // 검색어 입력 시 자동완성 결과 가져오기
-  useEffect(() => {
-    const delayDebounceFn = setTimeout(() => {
-      if (searchKeyword.trim().length >= 2) {
-        searchMedications(searchKeyword)
-      } else {
-        setSearchResults([])
-        setShowSearchResults(false)
-      }
-    }, 300)
 
-    return () => clearTimeout(delayDebounceFn)
-  }, [searchKeyword])
-  
   // 검색 결과 외부 클릭 시 닫기
   useEffect(() => {
     function handleClickOutside(event) {
       if (
-        searchResultsRef.current && 
+        searchResultsRef.current &&
         !searchResultsRef.current.contains(event.target) &&
         searchInputRef.current &&
         !searchInputRef.current.contains(event.target)
@@ -63,10 +55,10 @@ function Dashboard() {
         setShowSearchResults(false)
       }
     }
-    
+
     document.addEventListener("mousedown", handleClickOutside)
     return () => document.removeEventListener("mousedown", handleClickOutside)
-  }, [])
+  }, [setShowSearchResults])
 
   // 기저질환 가져오기
   const fetchDiseases = () => {
@@ -79,23 +71,6 @@ function Dashboard() {
       })
       .catch((err) => {
         console.error("기저질환 불러오기 실패:", err.response ? err.response.data : err)
-      })
-      .finally(() => {
-        setIsLoading(false)
-      })
-  }
-  
-  // 복용약 가져오기
-  const fetchMedications = () => {
-    setIsLoading(true)
-    api
-      .get("/user_health/drugs")
-      .then((res) => {
-        console.log("복용약 목록:", res.data)
-        setMedications(res.data)
-      })
-      .catch((err) => {
-        console.error("복용약 불러오기 실패:", err.response ? err.response.data : err)
       })
       .finally(() => {
         setIsLoading(false)
@@ -147,50 +122,10 @@ function Dashboard() {
         })
     }
   }
-  
-  // 복용약 검색하기
-  const searchMedications = (keyword) => {
-    if (keyword.trim().length < 2) return
-    
-    setIsSearching(true)
-    api
-      .get(`/user_health/drugs/search?keyword=${encodeURIComponent(keyword)}`)
-      .then((res) => {
-        console.log("약물 검색 결과:", res.data)
-        setSearchResults(res.data)
-        setShowSearchResults(true)
-      })
-      .catch((err) => {
-        console.error("약물 검색 실패:", err.response ? err.response.data : err)
-        setSearchResults([])
-      })
-      .finally(() => {
-        setIsSearching(false)
-      })
-  }
-  
+
   // 복용약 추가하기
   const handleAddMedication = (medication) => {
-    // 이미 추가된 약물인지 확인
-    if (medications.some(med => med.item_seq === medication.item_seq)) {
-      setShowSearchResults(false)
-      return
-    }
-    
-    setIsLoading(true)
-    api
-      .post("/user_health/drugs", { item_seq: medication.item_seq })
-      .then(() => {
-        setMedications(prev => [...prev, medication])
-        setSearchKeyword("")
-        setShowSearchResults(false)
-      })
-      .catch((err) => {
-        console.error("약물 추가 실패:", err.response ? err.response.data : err)
-      })
-      .finally(() => {
-        setIsLoading(false)
-      })
+    addMedication(medication)
   }
 
   // 삭제 확인 다이얼로그 열기 (기저질환 또는 복용약)
@@ -198,11 +133,9 @@ function Dashboard() {
     setAlertState({
       isOpen: true,
       title: type === "disease" ? "기저질환 삭제" : "복용약 삭제",
-      message: type === "disease" 
-        ? "정말 이 기저질환을 삭제하시겠습니까?" 
-        : "정말 이 복용약을 삭제하시겠습니까?",
+      message: type === "disease" ? "정말 이 기저질환을 삭제하시겠습니까?" : "정말 이 복용약을 삭제하시겠습니까?",
       itemId: itemId,
-      type: type
+      type: type,
     })
   }
 
@@ -212,12 +145,12 @@ function Dashboard() {
     if (!itemId) return
 
     setIsLoading(true)
-    
+
     if (type === "disease") {
       api
         .delete(`/user_health/conditions/${itemId}`)
         .then(() => {
-          setDiseases(prev => prev.filter(disease => disease.condition_id !== itemId))
+          setDiseases((prev) => prev.filter((disease) => disease.condition_id !== itemId))
           setAlertState({ ...alertState, isOpen: false })
         })
         .catch((err) => {
@@ -227,18 +160,8 @@ function Dashboard() {
           setIsLoading(false)
         })
     } else if (type === "medication") {
-      api
-        .delete(`/user_health/drugs/${itemId}`)
-        .then(() => {
-          setMedications(prev => prev.filter(med => med.item_seq !== itemId))
-          setAlertState({ ...alertState, isOpen: false })
-        })
-        .catch((err) => {
-          console.error("복용약 삭제 실패:", err.response ? err.response.data : err)
-        })
-        .finally(() => {
-          setIsLoading(false)
-        })
+      deleteMedication(itemId)
+      setAlertState({ ...alertState, isOpen: false })
     }
   }
 
@@ -332,16 +255,16 @@ function Dashboard() {
                     disabled={isLoading}
                   />
                   {isSearching && <span className="search-spinner"></span>}
-                  
+
                   {/* 검색 결과 드롭다운 */}
                   {showSearchResults && searchResults.length > 0 && (
                     <div className="search-results" ref={searchResultsRef}>
                       <ul>
                         {searchResults.map((medication) => (
                           <li key={medication.item_seq}>
-                            <button 
+                            <button
                               onClick={() => handleAddMedication(medication)}
-                              disabled={medications.some(med => med.item_seq === medication.item_seq)}
+                              disabled={medications.some((med) => med.item_seq === medication.item_seq)}
                             >
                               <span className="medication-name">{medication.item_name}</span>
                               <span className="medication-company">{medication.entp_name}</span>
