@@ -2,7 +2,6 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import HomePage from './pages/HomePage';
 import Login from './pages/Login';
 import Register from './pages/Register';
-import SymptomSearch from './pages/SymptomSearch';
 import OtcMeds from './pages/OtcMeds';
 import InteractionCheck from './pages/InteractionCheck';
 import Lens from './pages/Lens';
@@ -12,9 +11,11 @@ import SidebarLayout from './components/SidebarkLayout';
 import LoginSuccess from './pages/KaKaoRedirect';
 import ProtectedRoute from './components/ProtectedRoute';
 import Dashboard from './pages/Dashboard';
-import { MedicationProvider } from './context/medication-context'; // 이 경로는 실제 context 파일 경로에 맞게 수정하세요
+import SymptomPage from './pages/SymptomPage'; // 추가된 import
+import { MedicationProvider } from './context/medication-context';
 
 import '@fortawesome/fontawesome-free/css/all.min.css';
+import { SymptomProvider } from './context/symptom-context'; // 경로 수정
 
 function App() {
   return (
@@ -36,7 +37,9 @@ function App() {
           path="/symptom-search"
           element={
             <ProtectedRoute>
-              <SidebarLayout><SymptomSearch /></SidebarLayout>
+              <SymptomProvider>
+                <SidebarLayout><SymptomPage /></SidebarLayout>
+              </SymptomProvider>
             </ProtectedRoute>
           }
         />
