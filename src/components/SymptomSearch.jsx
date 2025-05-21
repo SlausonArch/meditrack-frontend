@@ -1,5 +1,3 @@
-"use client"
-
 // components/SymptomSearch.jsx
 import { useRef, useEffect, useState } from "react"
 import { useSymptom } from "../context/symptom-context" // 경로 수정

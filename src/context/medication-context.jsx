@@ -1,5 +1,3 @@
-"use client"
-
 import { createContext, useContext, useState, useEffect } from "react"
 import api from "../api" // api.js에서 axios 인스턴스 가져오기
 
@@ -26,8 +24,14 @@ export function MedicationProvider({ children }) {
   const [isLoading, setIsLoading] = useState(false) // 로딩 상태
   const [interactionMedication, setInteractionMedication] = useState(null) // 상호작용 확인용 약품
 
-  // 컴포넌트가 마운트될 때 복용약 가져오기
+  // 컴포넌트가 마운트될 때 토큰 설정 및 복용약 가져오기
   useEffect(() => {
+    // localStorage에서 토큰 가져와서 API 인스턴스에 설정
+    const token = localStorage.getItem("token")
+    if (token) {
+      api.defaults.headers.common["Authorization"] = `Bearer ${token}`
+    }
+
     fetchMedications()
   }, [])
 
@@ -97,7 +101,11 @@ export function MedicationProvider({ children }) {
 
     setIsLoading(true)
     api
-      .post("/user_health/drugs", { item_seq: medication.item_seq })
+      .post("/user_health/drugs", {
+        item_seq: medication.item_seq, // 백엔드로 item_seq 전송
+        // 필요한 경우 UI 표시용 데이터도 함께 전송
+        item_name: medication.item_name,
+      })
       .then(() => {
         setMedications((prev) => [...prev, medication])
         setSearchKeyword("")
@@ -137,46 +145,46 @@ export function MedicationProvider({ children }) {
     setInteractionMedication(null)
   }
 
-  // 약품 상호작용 확인 (백엔드 연동 예시)
+  // 약품 상호작용 확인
   const checkInteractions = async () => {
     if (!interactionMedication || medications.length === 0) return null
 
     setIsLoading(true)
     try {
-      // 실제 구현 시 백엔드 API 호출로 대체
-      // const response = await api.post('/user_health/interactions', {
-      //   current_medications: medications.map(med => med.item_seq),
-      //   check_medication: interactionMedication.item_seq
-      // });
-      // return response.data;
+      // localStorage에서 토큰 가져오기
+      const token = localStorage.getItem("token")
 
-      // 임시 데이터 (백엔드 연동 전 테스트용)
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+      if (!token) {
+        throw new Error("인증 토큰이 없습니다. 다시 로그인해주세요.")
+      }
 
-      // 목업 데이터 생성
-      const mockInteractions = medications.map((med) => ({
-        medication1: interactionMedication.item_name,
-        medication2: med.item_name,
-        level: Math.random() > 0.5 ? "warning" : "safe",
-        description:
-          Math.random() > 0.5
-            ? `${interactionMedication.item_name}은(는) ${med.item_name}의 효과를 감소시킬 수 있습니다.`
-            : "중요한 상호작용은 없습니다.",
-        recommendation: Math.random() > 0.5 ? "의사나 약사와 상담하세요." : "일반적인 용법용량을 따르세요.",
-      }))
-
-      const hasWarning = mockInteractions.some((interaction) => interaction.level === "warning")
-
-      const mockAlternatives = [
-        {
-          name: "타이레놀 (아세트아미노펜)",
-          description: "상호작용이 적은 진통제",
+      // 실제 API 호출 - POST 요청으로 변경
+      const response = await fetch(`http://13.209.5.228:8000/medications/check-interaction`, {
+        method: "POST",
+        headers: {
+          accept: "application/json",
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`, // 인증 토큰 추가
         },
-        {
-          name: "이지엔6 (이부프로펜 리시네이트)",
-          description: "일반 이부프로펜보다 위장관 부작용이 적음",
-        },
-      ]
+        body: JSON.stringify({
+          new_medication_id: interactionMedication.item_seq,
+        }),
+      })
+
+      if (response.status === 401) {
+        throw new Error("인증이 만료되었습니다. 다시 로그인해주세요.")
+      }
+
+      if (!response.ok) {
+        throw new Error("상호작용 확인 중 오류가 발생했습니다.")
+      }
+
+      // JSON 응답 처리
+      const data = await response.json()
+      console.log("API 응답 데이터:", data)
+
+      // 응답 구조에 맞게 UI 데이터 구성
+      const hasWarning = data.interactions.some((interaction) => interaction.interaction_type === "주의")
 
       setIsLoading(false)
       return {
@@ -186,8 +194,16 @@ export function MedicationProvider({ children }) {
             ? `${interactionMedication.item_name}과(와) 현재 복용 중인 약품 사이에 잠재적인 상호작용이 있습니다.`
             : "모든 약품이 안전하게 함께 복용 가능합니다.",
         },
-        interactions: mockInteractions,
-        alternatives: hasWarning ? mockAlternatives : [],
+        interactions: data.interactions.map((interaction) => ({
+          medication1: interactionMedication.item_name,
+          medication2: interaction.product_a,
+          manufacturer: interaction.manufacturer_a,
+          level: interaction.interaction_type === "주의" ? "warning" : "safe",
+          description: interaction.detail,
+          recommendation:
+            interaction.interaction_type === "주의" ? "의사나 약사와 상담하세요." : "일반적인 용법용량을 따르세요.",
+        })),
+        alternatives: data.alternative_drugs || [],
       }
     } catch (error) {
       console.error("상호작용 확인 실패:", error)

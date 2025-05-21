@@ -1,271 +1,192 @@
-/* 기본 스타일 및 리셋 */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  font-family: "Noto Sans KR", sans-serif;
-  line-height: 1.6;
-  color: #333;
-  background-color: #f8f9fa;
-}
-
-/* 버튼 스타일 */
-.btn {
-  display: inline-block;
-  padding: 10px 20px;
-  border-radius: 5px;
-  border: none;
-  cursor: pointer;
-  font-weight: 500;
-  transition: all 0.3s ease;
-}
-
-.primary-btn {
-  background-color: #4a6bdf;
-  color: white;
-}
-
-.primary-btn:hover {
-  background-color: #3a5bcf;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(74, 107, 223, 0.2);
-}
-
-.text-btn {
-  background-color: transparent;
-  color: #4a6bdf;
-  padding: 5px 10px;
-  border-radius: 4px;
-  transition: all 0.2s ease;
-}
-
-.text-btn:hover {
-  background-color: rgba(74, 107, 223, 0.1);
-  color: #3a5bcf;
-}
-
-.small-btn {
-  padding: 5px 10px;
-  font-size: 0.8rem;
-}
-
-/* 대시보드 레이아웃 */
-.dashboard-layout {
-  display: flex;
-  min-height: 100vh;
-  background-color: #f0f4ff;
-}
-
-/* 메인 콘텐츠 */
-.main-content {
-  flex: 1;
-  padding: 20px;
-}
-
-.content-header {
-  display: flex;
-  align-items: center;
-  margin-bottom: 20px;
-  background-color: white;
-  padding: 15px 20px;
-  border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-}
-
-.sidebar-toggle {
-  background: none;
-  border: none;
-  font-size: 1.2rem;
-  margin-right: 15px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #4a6bdf;
-  transition: transform 0.2s ease;
-}
-
-.sidebar-toggle:hover {
-  transform: scale(1.1);
-}
-
-.content-header h1 {
-  flex: 1;
-  font-size: 1.5rem;
-  color: #2d3748;
-}
-
+/* 대시보드 스타일 */
 .content-body {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 24px;
+}
+
+/* 요약 카드 스타일 */
+.summary-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
+.summary-card {
+  background-color: white;
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.summary-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.summary-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background-color: #e0f2fe;
+  color: #0284c7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 16px;
+}
+
+.summary-content {
+  flex: 1;
+}
+
+.summary-content h4 {
+  margin: 0 0 4px 0;
+  font-size: 0.875rem;
+  color: #64748b;
+}
+
+.summary-value {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #334155;
+}
+
+.summary-link {
+  color: #0284c7;
+  font-size: 0.875rem;
+  text-decoration: none;
+}
+
+.summary-link:hover {
+  text-decoration: underline;
 }
 
 /* 카드 스타일 */
 .card {
   background-color: white;
-  border-radius: 10px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   overflow: hidden;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
 }
 
 .card-header {
-  padding: 15px 20px;
-  border-bottom: 1px solid #eee;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #fafbff;
+  padding: 16px 20px;
+  border-bottom: 1px solid #e2e8f0;
 }
 
 .card-header h3 {
-  font-size: 1.2rem;
-  color: #2d3748;
-  font-weight: 600;
+  margin: 0;
+  font-size: 1.125rem;
+  color: #334155;
+}
+
+.card-link {
+  color: #0284c7;
+  font-size: 0.875rem;
+  text-decoration: none;
+}
+
+.card-link:hover {
+  text-decoration: underline;
 }
 
 .card-body {
   padding: 20px;
 }
 
-/* 질병 및 약물 카테고리 */
+/* 기저질환 스타일 */
 .disease-categories {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 16px;
 }
 
-/* 기저질환 추가 버튼 */
 .add-condition-btn {
-  background-color: #4a6bdf;
-  color: white;
-  border-radius: 6px;
-  padding: 10px 20px;
-  font-weight: 500;
-  display: inline-flex;
+  align-self: flex-start;
+  display: flex;
   align-items: center;
-  margin-bottom: 15px;
-  box-shadow: 0 4px 6px rgba(74, 107, 223, 0.2);
-  transition: all 0.3s ease;
+  gap: 8px;
+  background-color: #0284c7;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s;
 }
 
 .add-condition-btn:hover {
-  background-color: #3a5bcf;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 10px rgba(74, 107, 223, 0.3);
+  background-color: #0369a1;
 }
 
-.add-condition-btn:before {
-  content: "+";
-  margin-right: 8px;
-  font-size: 1.2rem;
-  font-weight: bold;
-}
-
-/* 기저질환 목록 스타일 */
 .condition-list {
-  background-color: #f8faff;
+  background-color: #f8fafc;
   border-radius: 8px;
-  padding: 15px;
-  margin-bottom: 20px;
-  border: 1px solid #e0e7ff;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-  animation: fadeIn 0.3s ease-in-out;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  padding: 16px;
 }
 
 .condition-list h4 {
-  color: #2d3748;
+  margin-top: 0;
   margin-bottom: 12px;
-  font-size: 1.1rem;
-  border-bottom: 1px solid #e0e7ff;
-  padding-bottom: 8px;
+  font-size: 1rem;
 }
 
 .condition-list ul {
   list-style: none;
+  padding: 0;
+  margin: 0;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 10px;
-}
-
-.condition-list li {
-  margin-bottom: 5px;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 8px;
 }
 
 .condition-list button {
   width: 100%;
   text-align: left;
+  background: none;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
   padding: 8px 12px;
-  background-color: white;
-  border: 1px solid #e0e7ff;
-  border-radius: 5px;
-  color: #4a5568;
-  transition: all 0.2s ease;
   cursor: pointer;
-  font-size: 0.9rem;
+  transition: background-color 0.2s;
 }
 
-.condition-list button:hover {
-  background-color: #4a6bdf;
-  color: white;
-  border-color: #4a6bdf;
-  transform: translateY(-2px);
-  box-shadow: 0 2px 5px rgba(74, 107, 223, 0.2);
+.condition-list button:hover:not(:disabled) {
+  background-color: #e0f2fe;
 }
 
 .condition-list button:disabled {
-  background-color: #f1f1f1;
-  color: #a0aec0;
-  border-color: #e2e8f0;
+  opacity: 0.5;
   cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
 }
 
-/* 선택된 기저질환 목록 */
 .selected-diseases {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
-/* 약물 카드 */
 .medication-card {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 15px;
-  border: 1px solid #e0e7ff;
+  padding: 12px 16px;
+  background-color: #f8fafc;
   border-radius: 8px;
-  background-color: white;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
+  transition: background-color 0.2s;
 }
 
 .medication-card:hover {
-  border-color: #4a6bdf;
-  box-shadow: 0 4px 10px rgba(74, 107, 223, 0.1);
-  transform: translateY(-2px);
+  background-color: #f1f5f9;
 }
 
 .medication-info {
@@ -273,192 +194,137 @@ body {
 }
 
 .medication-info h4 {
-  font-size: 1.1rem;
-  color: #2d3748;
-  font-weight: 500;
+  margin: 0 0 4px 0;
+  font-size: 1rem;
 }
 
 .medication-company {
-  font-size: 0.85rem;
-  color: #718096;
-  margin-top: 4px;
+  margin: 0;
+  font-size: 0.875rem;
+  color: #64748b;
 }
 
 .medication-actions {
   display: flex;
+  gap: 8px;
+}
+
+/* 복용 알림 스타일 */
+.reminders-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.reminder-item {
+  display: flex;
+  justify-content: space-between;
   align-items: center;
-}
-
-/* 삭제 버튼 스타일 */
-.medication-actions .text-btn {
-  color: #e53e3e;
-  font-size: 0.9rem;
-  padding: 6px 12px;
-  border-radius: 5px;
-  transition: all 0.2s ease;
-}
-
-.medication-actions .text-btn:hover {
-  background-color: rgba(229, 62, 62, 0.1);
-}
-
-.medication-actions .text-btn:disabled {
-  color: #cbd5e0;
-  background-color: transparent;
-  cursor: not-allowed;
-}
-
-/* 복용약 섹션 스타일 */
-.medication-section {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.medication-search {
-  margin-bottom: 20px;
-}
-
-.search-container {
-  position: relative;
-  margin-bottom: 8px;
-}
-
-.search-input {
-  width: 100%;
-  padding: 12px 15px;
-  border: 1px solid #e0e7ff;
+  padding: 12px 16px;
+  background-color: #f8fafc;
   border-radius: 8px;
+  border-left: 4px solid #0284c7;
+}
+
+.reminder-item.completed {
+  opacity: 0.7;
+  border-left-color: #16a34a;
+}
+
+.reminder-info h4 {
+  margin: 0 0 4px 0;
   font-size: 1rem;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
 }
 
-.search-input:focus {
-  outline: none;
-  border-color: #4a6bdf;
-  box-shadow: 0 0 0 3px rgba(74, 107, 223, 0.2);
+.reminder-info p {
+  margin: 0;
+  font-size: 0.875rem;
+  color: #64748b;
 }
 
-.search-input:disabled {
-  background-color: #f1f1f1;
-  cursor: not-allowed;
-}
-
-.search-spinner {
-  position: absolute;
-  right: 15px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 20px;
-  height: 20px;
-  border: 3px solid rgba(74, 107, 223, 0.3);
-  border-radius: 50%;
-  border-top-color: #4a6bdf;
-  animation: spin 1s ease-in-out infinite;
-}
-
-.search-hint {
-  font-size: 0.85rem;
-  color: #718096;
-  margin-top: 5px;
-  margin-left: 5px;
-}
-
-.search-results {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  width: 100%;
-  background-color: white;
-  border: 1px solid #e0e7ff;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  z-index: 10;
-  max-height: 300px;
-  overflow-y: auto;
-  animation: fadeIn 0.2s ease-in-out;
-}
-
-.search-results ul {
-  list-style: none;
-  padding: 0;
-}
-
-.search-results li {
-  border-bottom: 1px solid #f0f4ff;
-}
-
-.search-results li:last-child {
-  border-bottom: none;
-}
-
-.search-results button {
-  width: 100%;
-  text-align: left;
-  padding: 12px 15px;
-  background-color: transparent;
-  border: none;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-  display: flex;
-  flex-direction: column;
-}
-
-.search-results button:hover {
-  background-color: #f8faff;
-}
-
-.search-results button:disabled {
-  background-color: #f1f1f1;
-  cursor: not-allowed;
-}
-
-.search-results .medication-name {
+.completed-badge {
+  display: inline-block;
+  padding: 4px 8px;
+  background-color: #f0fdf4;
+  color: #16a34a;
+  border-radius: 4px;
+  font-size: 0.75rem;
   font-weight: 500;
-  color: #2d3748;
 }
 
-.search-results .medication-company {
-  font-size: 0.85rem;
-  color: #718096;
-  margin-top: 4px;
+/* 경고 카드 스타일 */
+.warning-card {
+  border-left: 4px solid #f87171;
 }
 
-.medication-list h4 {
-  color: #2d3748;
-  margin-bottom: 15px;
-  font-size: 1.1rem;
-  border-bottom: 1px solid #e0e7ff;
-  padding-bottom: 8px;
-}
-
-.selected-medications {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 15px;
-}
-
-.no-data {
-  color: #718096;
-  font-style: italic;
-  text-align: center;
-  padding: 20px;
-  background-color: #f8faff;
+.warning-item {
+  display: flex;
+  align-items: flex-start;
+  padding: 12px 16px;
+  background-color: #fef2f2;
   border-radius: 8px;
-  border: 1px dashed #e0e7ff;
 }
 
-/* 로딩 인디케이터 */
+.warning-icon {
+  color: #dc2626;
+  margin-right: 12px;
+  margin-top: 2px;
+}
+
+.warning-content h4 {
+  margin: 0 0 4px 0;
+  font-size: 1rem;
+  color: #b91c1c;
+}
+
+.warning-content p {
+  margin: 0;
+  font-size: 0.875rem;
+  color: #64748b;
+}
+
+/* 버튼 스타일 */
+.btn {
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.text-btn {
+  background: none;
+  color: #0284c7;
+  padding: 6px 12px;
+}
+
+.text-btn:hover {
+  text-decoration: underline;
+}
+
+.primary-btn {
+  background-color: #0284c7;
+  color: white;
+  padding: 8px 16px;
+}
+
+.primary-btn:hover {
+  background-color: #0369a1;
+}
+
+.small-btn {
+  padding: 4px 8px;
+  font-size: 0.875rem;
+}
+
 .loading-spinner {
   display: inline-block;
-  width: 20px;
-  height: 20px;
-  border: 3px solid rgba(74, 107, 223, 0.3);
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
   border-radius: 50%;
-  border-top-color: #4a6bdf;
-  animation: spin 1s ease-in-out infinite;
-  margin-right: 10px;
+  border-top-color: white;
+  animation: spin 1s linear infinite;
+  margin-right: 8px;
 }
 
 @keyframes spin {
@@ -467,143 +333,8 @@ body {
   }
 }
 
-/* 커스텀 알림창 스타일 */
-.custom-alert {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-  opacity: 0;
-  visibility: hidden;
-  transition: all 0.3s ease;
-}
-
-.custom-alert.show {
-  opacity: 1;
-  visibility: visible;
-}
-
-.alert-content {
-  background-color: white;
-  border-radius: 10px;
-  padding: 25px;
-  width: 90%;
-  max-width: 400px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-  text-align: center;
-  transform: translateY(-20px);
-  transition: transform 0.3s ease;
-}
-
-.custom-alert.show .alert-content {
-  transform: translateY(0);
-}
-
-.alert-title {
-  font-size: 1.2rem;
-  color: #2d3748;
-  margin-bottom: 15px;
-  font-weight: 600;
-}
-
-.alert-message {
-  margin-bottom: 20px;
-  color: #4a5568;
-}
-
-.alert-actions {
-  display: flex;
-  justify-content: center;
-  gap: 15px;
-}
-
-.alert-actions button {
-  padding: 10px 20px;
-  border-radius: 5px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.alert-cancel {
-  background-color: #e2e8f0;
-  color: #4a5568;
-  border: none;
-}
-
-.alert-cancel:hover {
-  background-color: #cbd5e0;
-}
-
-.alert-confirm {
-  background-color: #e53e3e;
-  color: white;
-  border: none;
-}
-
-.alert-confirm:hover {
-  background-color: #c53030;
-}
-
-/* 반응형 스타일 */
-@media (max-width: 768px) {
-  .sidebar-toggle {
-    display: block;
-  }
-
-  .main-content {
-    margin-left: 0;
-  }
-
-  .condition-list ul {
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  }
-
-  .selected-diseases,
-  .selected-medications {
-    grid-template-columns: 1fr;
-  }
-
-  .search-results {
-    max-height: 250px;
-  }
-}
-
-@media (max-width: 576px) {
-  .content-header {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .content-header h1 {
-    margin-top: 10px;
-  }
-
-  .medication-card {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .medication-info {
-    margin-bottom: 10px;
-  }
-
-  .medication-actions {
-    width: 100%;
-    justify-content: flex-end;
-  }
-
-  .condition-list ul {
-    grid-template-columns: 1fr;
-  }
-
-  .search-results {
-    max-height: 200px;
-  }
+.no-data {
+  color: #64748b;
+  font-style: italic;
+  margin: 16px 0;
 }

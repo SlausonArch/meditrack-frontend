@@ -1,0 +1,402 @@
+/* 내 약품 페이지 스타일 */
+.content-body {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* 카드 스타일 */
+.card {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  overflow: visible;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.card-header h3 {
+  margin: 0;
+  font-size: 1.125rem;
+  color: #334155;
+}
+
+.card-link {
+  color: #0284c7;
+  font-size: 0.875rem;
+  text-decoration: none;
+}
+
+.card-link:hover {
+  text-decoration: underline;
+}
+
+.card-body {
+  padding: 20px;
+}
+
+.card-actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* 약품 검색 스타일 */
+.medication-search {
+  width: 100%;
+}
+
+.search-container {
+  position: relative;
+  width: 100%;
+  margin-bottom: 8px;
+}
+
+.search-input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 0.9375rem;
+}
+
+.search-spinner {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(0, 0, 0, 0.1);
+  border-top-color: #0284c7;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: translateY(-50%) rotate(360deg);
+  }
+}
+
+.search-hint {
+  font-size: 0.875rem;
+  color: #64748b;
+  margin: 8px 0 0 0;
+}
+
+.search-results {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  max-height: 300px;
+  overflow-y: auto;
+  background-color: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+  margin-top: 4px;
+}
+
+.search-results ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.search-results li {
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.search-results li:last-child {
+  border-bottom: none;
+}
+
+.search-results button {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  padding: 12px 16px;
+  text-align: left;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.search-results button:hover:not(:disabled) {
+  background-color: #f8fafc;
+}
+
+.search-results button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.medication-name {
+  font-weight: 500;
+  font-size: 0.9375rem;
+  color: #334155;
+  margin-bottom: 4px;
+}
+
+.medication-company {
+  font-size: 0.8125rem;
+  color: #64748b;
+}
+
+/* 약품 목록 스타일 */
+.medications-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+}
+
+.medication-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  background-color: #f8fafc;
+  border-radius: 8px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.medication-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.medication-info {
+  flex: 1;
+}
+
+.medication-info h4 {
+  margin: 0 0 4px 0;
+  font-size: 1rem;
+}
+
+.medication-company {
+  margin: 0;
+  font-size: 0.875rem;
+  color: #64748b;
+}
+
+.medication-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.icon-btn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+  color: #64748b;
+  border-radius: 50%;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.icon-btn:hover {
+  background-color: #f1f5f9;
+  color: #0284c7;
+}
+
+.delete-btn:hover {
+  color: #dc2626;
+}
+
+/* 복용 일정 스타일 */
+.schedule-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.schedule-item {
+  flex: 1;
+  min-width: 200px;
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  background-color: #f8fafc;
+  border-radius: 8px;
+}
+
+.schedule-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 12px;
+}
+
+.schedule-icon.morning {
+  background-color: #fef3c7;
+  color: #d97706;
+}
+
+.schedule-icon.noon {
+  background-color: #e0f2fe;
+  color: #0284c7;
+}
+
+.schedule-icon.evening {
+  background-color: #f3e8ff;
+  color: #9333ea;
+}
+
+.schedule-content h4 {
+  margin: 0 0 4px 0;
+  font-size: 1rem;
+}
+
+.schedule-content p {
+  margin: 0;
+  font-size: 0.875rem;
+  color: #64748b;
+}
+
+/* 빈 상태 스타일 */
+.empty-state {
+  text-align: center;
+  padding: 32px 0;
+}
+
+.no-data {
+  color: #64748b;
+  font-style: italic;
+  margin: 0 0 8px 0;
+}
+
+/* 모달 스타일 */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-container {
+  width: 90%;
+  max-width: 600px;
+  background-color: white;
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #64748b;
+}
+
+.modal-body {
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.modal-footer {
+  padding: 16px 20px;
+  border-top: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.medication-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.detail-section h4 {
+  margin: 0 0 8px 0;
+  font-size: 1rem;
+  color: #64748b;
+}
+
+.detail-section p {
+  margin: 0;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  white-space: pre-line;
+}
+
+/* 버튼 스타일 */
+.btn {
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.text-btn {
+  background: none;
+  color: #0284c7;
+  padding: 6px 12px;
+}
+
+.text-btn:hover {
+  text-decoration: underline;
+}
+
+.primary-btn {
+  background-color: #0284c7;
+  color: white;
+  padding: 8px 16px;
+}
+
+.primary-btn:hover {
+  background-color: #0369a1;
+}
+
+.outline-btn {
+  background-color: transparent;
+  border: 1px solid #0284c7;
+  color: #0284c7;
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.outline-btn:hover {
+  background-color: #f0f9ff;
+}

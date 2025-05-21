@@ -16,6 +16,7 @@ import { MedicationProvider } from './context/medication-context';
 
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import { SymptomProvider } from './context/symptom-context'; // 경로 수정
+import MyMedications from './pages/MyMedications';
 
 function App() {
   return (
@@ -65,7 +66,9 @@ function App() {
           path="/lens"
           element={
             <ProtectedRoute>
-              <SidebarLayout><Lens /></SidebarLayout>
+              <MedicationProvider>
+                <SidebarLayout><Lens /></SidebarLayout>
+              </MedicationProvider>
             </ProtectedRoute>
           }
         />
@@ -76,6 +79,17 @@ function App() {
             <ProtectedRoute>
               <MedicationProvider>
                 <SidebarLayout><Dashboard /></SidebarLayout>
+              </MedicationProvider>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/my-medications"
+          element={
+            <ProtectedRoute>
+              <MedicationProvider>
+                <SidebarLayout><MyMedications /></SidebarLayout>
               </MedicationProvider>
             </ProtectedRoute>
           }

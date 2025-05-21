@@ -1,5 +1,3 @@
-"use client"
-
 import { useEffect, useState, useRef } from "react"
 import "../styles/styles.css"
 import "../styles/interaction.css" // 스타일 파일 추가
@@ -38,7 +36,7 @@ function InteractionCheck() {
   useEffect(() => {
     function handleClickOutside(event) {
       if (
-        searchResultsRef.current && 
+        searchResultsRef.current &&
         !searchResultsRef.current.contains(event.target) &&
         searchInputRef.current &&
         !searchInputRef.current.contains(event.target)
@@ -46,7 +44,7 @@ function InteractionCheck() {
         setShowSearchResults(false)
       }
     }
-    
+
     document.addEventListener("mousedown", handleClickOutside)
     return () => document.removeEventListener("mousedown", handleClickOutside)
   }, [setShowSearchResults])
@@ -73,9 +71,68 @@ function InteractionCheck() {
     }
 
     setIsCheckingInteraction(true)
-    const results = await checkInteractions()
-    setInteractionResults(results)
-    setIsCheckingInteraction(false)
+
+    try {
+      // localStorage에서 토큰 가져오기
+      const token = localStorage.getItem("token")
+
+      if (!token) {
+        throw new Error("인증 토큰이 없습니다. 다시 로그인해주세요.")
+      }
+
+      // 백엔드 API 호출로 상호작용 확인 - POST 요청으로 변경
+      const response = await fetch(`http://13.209.5.228:8000/medications/check-interaction`, {
+        method: "POST",
+        headers: {
+          accept: "application/json",
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`, // 인증 토큰 추가
+        },
+        body: JSON.stringify({
+          new_medication_id: interactionMedication.item_seq,
+        }),
+      })
+
+      if (response.status === 401) {
+        throw new Error("인증이 만료되었습니다. 다시 로그인해주세요.")
+      }
+
+      if (!response.ok) {
+        throw new Error("상호작용 확인 중 오류가 발생했습니다.")
+      }
+
+      // JSON 응답 처리
+      const data = await response.json()
+      console.log("API 응답 데이터:", data)
+
+      // 응답 구조에 맞게 UI 데이터 구성
+      const hasWarning = data.interactions.some((interaction) => interaction.interaction_type === "주의")
+
+      setInteractionResults({
+        summary: {
+          hasWarning,
+          message: hasWarning
+            ? `${interactionMedication.item_name}과(와) 현재 복용 중인 약품 사이에 잠재적인 상호작용이 있습니다.`
+            : "모든 약품이 안전하게 함께 복용 가능합니다.",
+        },
+        interactions: data.interactions.map((interaction) => ({
+          medication1: interactionMedication.item_name,
+          medication2: interaction.product_a,
+          manufacturer: interaction.manufacturer_a,
+          level: interaction.interaction_type === "주의" ? "warning" : "safe",
+          description: interaction.detail,
+          recommendation:
+            interaction.interaction_type === "주의" ? "의사나 약사와 상담하세요." : "일반적인 용법용량을 따르세요.",
+        })),
+        alternatives: data.alternative_drugs || [],
+      })
+    } catch (error) {
+      console.error("상호작용 확인 실패:", error)
+      alert(error.message || "상호작용 확인 중 오류가 발생했습니다.")
+      setInteractionResults(null)
+    } finally {
+      setIsCheckingInteraction(false)
+    }
   }
 
   // 디버깅용 로그
@@ -135,19 +192,22 @@ function InteractionCheck() {
                       disabled={isLoading}
                     />
                     {isSearching && <span className="search-spinner"></span>}
-                    
+
                     {/* 검색 결과 드롭다운 */}
                     {showSearchResults && searchResults.length > 0 && (
                       <div className="search-results" ref={searchResultsRef}>
                         <ul>
                           {searchResults.map((medication) => (
                             <li key={medication.item_seq}>
-                              <button 
+                              <button
                                 onClick={() => handleSelectMedication(medication)}
-                                disabled={medications.some(med => med.item_seq === medication.item_seq)}
+                                disabled={medications.some((med) => med.item_seq === medication.item_seq)}
                               >
                                 <span className="medication-name">{medication.item_name}</span>
                                 <span className="medication-company">{medication.entp_name}</span>
+                                <span className="medication-seq" style={{ fontSize: "0.7em", color: "#888" }}>
+                                  코드: {medication.item_seq}
+                                </span>
                               </button>
                             </li>
                           ))}
@@ -211,10 +271,15 @@ function InteractionCheck() {
                           {interaction.medication1} + {interaction.medication2}
                         </h5>
                         <span className={`interaction-level ${interaction.level}`}>
-                          {interaction.level === "warning" ? "중등도" : "안전"}
+                          {interaction.level === "warning" ? "주의" : "안전"}
                         </span>
                       </div>
                       <div className="interaction-content">
+                        {interaction.manufacturer && (
+                          <p className="manufacturer">
+                            <strong>제조사:</strong> {interaction.manufacturer}
+                          </p>
+                        )}
                         <p>{interaction.description}</p>
                         <p>
                           <strong>권장사항:</strong> {interaction.recommendation}
@@ -232,8 +297,13 @@ function InteractionCheck() {
                       {interactionResults.alternatives.map((alternative, index) => (
                         <div className="alternative-item" key={index}>
                           <div className="alternative-info">
-                            <h5>{alternative.name}</h5>
-                            <p>{alternative.description}</p>
+                            <h5>{alternative.item_name}</h5>
+                            <p>
+                              <strong>제조사:</strong> {alternative.manufacturer}
+                            </p>
+                            <p>
+                              <strong>주요 성분:</strong> {alternative.ingredient}
+                            </p>
                           </div>
                           <button className="btn text-btn">상세정보</button>
                         </div>

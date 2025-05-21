@@ -1,5 +1,3 @@
-"use client"
-
 // context/symptom-context.jsx
 import { createContext, useContext, useState, useEffect } from "react"
 import api from "../api" // axios 인스턴스

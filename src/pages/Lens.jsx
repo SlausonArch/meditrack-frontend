@@ -1,24 +1,57 @@
-"use client"
-
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import "../styles/lens.css"
-import { Search } from "lucide-react"
+import { Search, Upload, Camera, Clipboard, ImageIcon } from "lucide-react"
+import { useMedication } from "../context/medication-context"
+import { useMobile } from "../hooks/use-mobile"
 
 function Lens() {
+  const { addMedication } = useMedication()
+  const isMobile = useMobile()
+
   const [searchTerm, setSearchTerm] = useState("")
   const [searchResults, setSearchResults] = useState([])
   const [isSearching, setIsSearching] = useState(false)
   const [selectedMedication, setSelectedMedication] = useState(null)
   const [showDetail, setShowDetail] = useState(false)
 
+  // 이미지 업로드 및 스캔 관련 상태
+  const [selectedImage, setSelectedImage] = useState(null)
+  const [previewUrl, setPreviewUrl] = useState(null)
+  const [isScanning, setIsScanning] = useState(false)
+  const [scanResults, setScanResults] = useState([])
+  const [scanError, setScanError] = useState(null)
+
+  const fileInputRef = useRef(null)
+  const cameraInputRef = useRef(null)
+  const scanPreviewRef = useRef(null)
+
   useEffect(() => {
-    const scanBtn = document.querySelector(".scan-btn")
-    if (scanBtn) {
-      scanBtn.addEventListener("click", () => {
-        alert("카메라 스캔 기능은 추후 구현 예정입니다.")
-      })
+    // 이미지 선택 취소 시 미리보기 초기화
+    if (!selectedImage) {
+      setPreviewUrl(null)
     }
-  }, [])
+
+    // 클립보드 붙여넣기 이벤트 리스너 (PC 전용)
+    if (!isMobile) {
+      const handlePaste = (e) => {
+        // 스캔 미리보기 영역이 포커스되어 있을 때만 처리
+        if (document.activeElement === scanPreviewRef.current) {
+          const items = e.clipboardData.items
+
+          for (let i = 0; i < items.length; i++) {
+            if (items[i].type.indexOf("image") !== -1) {
+              const blob = items[i].getAsFile()
+              handleImageFile(blob)
+              break
+            }
+          }
+        }
+      }
+
+      window.addEventListener("paste", handlePaste)
+      return () => window.removeEventListener("paste", handlePaste)
+    }
+  }, [selectedImage, isMobile])
 
   // 약품 검색 함수 (백엔드 연동 예시)
   const searchMedication = async () => {
@@ -75,6 +108,111 @@ function Lens() {
     }
   }
 
+  // 이미지 파일 처리 함수
+  const handleImageFile = (file) => {
+    if (file) {
+      setSelectedImage(file)
+      setPreviewUrl(URL.createObjectURL(file))
+      setScanResults([]) // 새 이미지 선택 시 이전 스캔 결과 초기화
+      setScanError(null)
+    }
+  }
+
+  // 일반 이미지 선택 핸들러
+  const handleImageSelect = (e) => {
+    const file = e.target.files[0]
+    handleImageFile(file)
+  }
+
+  // 카메라 촬영 핸들러 (모바일)
+  const handleCameraCapture = (e) => {
+    const file = e.target.files[0]
+    handleImageFile(file)
+  }
+
+  // 이미지 업로드 버튼 클릭 핸들러
+  const handleUploadClick = () => {
+    fileInputRef.current.click()
+  }
+
+  // 카메라 버튼 클릭 핸들러 (모바일)
+  const handleCameraClick = () => {
+    cameraInputRef.current.click()
+  }
+
+  // 클립보드에서 붙여넣기 핸들러 (PC)
+  const handlePasteClick = () => {
+    // 스캔 미리보기 영역에 포커스를 주어 붙여넣기 이벤트를 받을 수 있게 함
+    scanPreviewRef.current.focus()
+    alert("Ctrl+V를 눌러 클립보드의 이미지를 붙여넣으세요.")
+  }
+
+  // 이미지 스캔 처리 함수
+  const handleScanImage = async () => {
+    if (!selectedImage) {
+      setScanError("이미지를 먼저 선택해주세요.")
+      return
+    }
+
+    setIsScanning(true)
+    setScanError(null)
+
+    try {
+      // localStorage에서 토큰 가져오기
+      const token = localStorage.getItem("token")
+      if (!token) {
+        throw new Error("인증 토큰이 없습니다. 다시 로그인해주세요.")
+      }
+
+      // FormData 생성
+      const formData = new FormData()
+      formData.append("file", selectedImage) // "image"에서 "file"로 변경
+
+      // API 호출
+      const response = await fetch("http://13.209.5.228:8000/image/scan", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          accept: "application/json",
+          // Content-Type은 FormData를 사용할 때 자동으로 설정되므로 명시적으로 설정하지 않음
+        },
+        body: formData,
+      })
+
+      if (response.status === 401) {
+        throw new Error("인증이 만료되었습니다. 다시 로그인해주세요.")
+      }
+
+      if (response.status === 422) {
+        throw new Error("이미지 형식이 올바르지 않거나 서버에서 처리할 수 없습니다.")
+      }
+
+      if (!response.ok) {
+        throw new Error("이미지 스캔 중 오류가 발생했습니다.")
+      }
+
+      const data = await response.json()
+      console.log("스캔 결과:", data)
+
+      if (data.length === 0) {
+        setScanError("이미지에서 약품을 인식할 수 없습니다. 다른 이미지를 시도해보세요.")
+      } else {
+        setScanResults(data)
+      }
+    } catch (error) {
+      console.error("이미지 스캔 실패:", error)
+      setScanError(error.message || "이미지 스캔 중 오류가 발생했습니다.")
+    } finally {
+      setIsScanning(false)
+    }
+  }
+
+  // 복용약 추가 핸들러
+  const handleAddMedication = (medication) => {
+    addMedication(medication)
+    alert(`${medication.item_name}이(가) 복용약에 추가되었습니다.`)
+  }
+
   const handleShowDetail = (medication) => {
     setSelectedMedication(medication)
     setShowDetail(true)
@@ -103,8 +241,8 @@ function Lens() {
         </header>
 
         <div className="content-body">
-          {/* 검색 카드 */}
-          <div className="card">
+          {/* 검색 카드 ---> 쓸지 안쓸지 몰라서 비활성화 */}
+          {/* <div className="card">
             <div className="card-header">
               <h3>약품 검색</h3>
             </div>
@@ -131,20 +269,92 @@ function Lens() {
                 </div>
               </div>
             </div>
-          </div>
+          </div> */}
 
           {/* 카메라 스캔 카드 */}
           <div className="card">
             <div className="card-header">
-              <h3>카메라로 약품 스캔</h3>
+              <h3>이미지로 약품 스캔</h3>
             </div>
             <div className="card-body scan-body">
-              <div className="scan-preview">
-                <img src="https://placehold.co/300x300" alt="약품 스캔 프리뷰" />
+              <div
+                className="scan-preview"
+                ref={scanPreviewRef}
+                tabIndex={0} // 포커스를 받을 수 있도록 tabIndex 설정
+              >
+                {previewUrl ? (
+                  <img src={previewUrl || "/placeholder.svg"} alt="약품 이미지 미리보기" className="preview-image" />
+                ) : (
+                  <div className="empty-preview">
+                    <Camera size={48} />
+                    <p>이미지를 선택해주세요</p>
+                    {!isMobile && <p className="paste-hint">클립보드에서 붙여넣기도 가능합니다 (Ctrl+V)</p>}
+                  </div>
+                )}
               </div>
               <div className="scan-instruction">
-                <p>약품의 포장이나 라벨을 카메라에 비춰주세요.</p>
-                <button className="btn primary-btn scan-btn">스캔 시작</button>
+                <p>약품의 포장이나 라벨 이미지를 업로드하세요.</p>
+                <div className="scan-actions">
+                  {/* 일반 파일 업로드 (PC/모바일 공통) */}
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleImageSelect}
+                    accept="image/*"
+                    style={{ display: "none" }}
+                  />
+
+                  {/* 카메라 캡처 (모바일 전용) */}
+                  {isMobile && (
+                    <input
+                      type="file"
+                      ref={cameraInputRef}
+                      onChange={handleCameraCapture}
+                      accept="image/*"
+                      capture="environment"
+                      style={{ display: "none" }}
+                    />
+                  )}
+
+                  {/* PC 환경 버튼 */}
+                  {!isMobile && (
+                    <>
+                      <button className="btn outline-btn" onClick={handleUploadClick}>
+                        <Upload size={16} />
+                        <span>이미지 업로드</span>
+                      </button>
+                      <button className="btn outline-btn" onClick={handlePasteClick}>
+                        <Clipboard size={16} />
+                        <span>클립보드에서 붙여넣기</span>
+                      </button>
+                    </>
+                  )}
+
+                  {/* 모바일 환경 버튼 */}
+                  {isMobile && (
+                    <>
+                      <button className="btn outline-btn" onClick={handleCameraClick}>
+                        <Camera size={16} />
+                        <span>카메라 촬영</span>
+                      </button>
+                      <button className="btn outline-btn" onClick={handleUploadClick}>
+                        <ImageIcon size={16} />
+                        <span>갤러리에서 선택</span>
+                      </button>
+                    </>
+                  )}
+                </div>
+
+                {/* 스캔 버튼 (공통) */}
+                <button
+                  className="btn primary-btn scan-btn"
+                  onClick={handleScanImage}
+                  disabled={!selectedImage || isScanning}
+                >
+                  {isScanning ? "스캔 중..." : "스캔 시작"}
+                </button>
+
+                {scanError && <p className="scan-error">{scanError}</p>}
               </div>
             </div>
           </div>
@@ -180,25 +390,32 @@ function Lens() {
           )}
 
           {/* 스캔된 약품 정보 */}
-          <div className="card scanned-results">
-            <div className="card-header">
-              <h3>스캔된 약품 정보</h3>
-            </div>
-            <div className="card-body">
-              <div className="scanned-item">
-                <h4>타이레놀 500mg</h4>
-                <p>진통, 해열 효과가 있으며 일반의약품입니다.</p>
-                <div className="scanned-tags">
-                  <span className="tag safe">안전</span>
-                  <span className="tag">진통제</span>
-                </div>
+          {scanResults.length > 0 && (
+            <div className="card scanned-results">
+              <div className="card-header">
+                <h3>스캔된 약품 정보</h3>
+                <span className="result-count">{scanResults.length}개 발견</span>
               </div>
-              <div className="scanned-actions">
-                <button className="btn text-btn">상세정보</button>
-                <button className="btn primary-btn small-btn">복용 추가</button>
+              <div className="card-body">
+                {scanResults.map((medication, index) => (
+                  <div className="scanned-item" key={index}>
+                    <div className="medication-info">
+                      <h4>{medication.item_name}</h4>
+                      <p className="manufacturer">{medication.entp_name}</p>
+                      <div className="scanned-tags">
+                        <span className="tag">코드: {medication.item_seq}</span>
+                      </div>
+                    </div>
+                    <div className="scanned-actions">
+                      <button className="btn primary-btn small-btn" onClick={() => handleAddMedication(medication)}>
+                        복용 추가
+                      </button>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
-          </div>
+          )}
         </div>
       </main>
 

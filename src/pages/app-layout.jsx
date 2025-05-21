@@ -1,5 +1,3 @@
-"use client"
-
 import { MedicationProvider } from "./context/medication-context"
 
 function AppLayout({ children }) {

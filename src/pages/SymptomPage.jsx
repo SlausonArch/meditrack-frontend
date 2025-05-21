@@ -1,5 +1,3 @@
-"use client"
-
 import { useState, useEffect } from "react"
 import { SymptomProvider } from "../context/symptom-context"
 import SymptomSearchInput from "../components/SymptomSearch"
