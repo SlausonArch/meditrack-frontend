@@ -16,7 +16,7 @@ import { MedicationProvider } from './context/medication-context';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import { SymptomProvider } from './context/symptom-context'; // 경로 수정
 import MyMedications from './pages/MyMedications';
-import MedicationReminders from './pages/medication-reminders';
+import MedicationReminders from './pages/Medication-Reminders';
 
 function App() {
   return (
