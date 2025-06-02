@@ -1,44 +1,29 @@
 import { useEffect, useState } from "react"
-import "../styles/dashboard.css"
+import "../styles/my-medications.css"
 
-interface CustomAlertProps {
-  isOpen: boolean
-  title: string
-  message: string
-  onConfirm: () => void
-  onCancel: () => void
-}
-
-export default function CustomAlert({ isOpen, title, message, onConfirm, onCancel }: CustomAlertProps) {
-  const [isVisible, setIsVisible] = useState(false)
-
-  useEffect(() => {
-    if (isOpen) {
-      setIsVisible(true)
-    } else {
-      const timer = setTimeout(() => {
-        setIsVisible(false)
-      }, 300)
-      return () => clearTimeout(timer)
-    }
-  }, [isOpen])
-
-  if (!isVisible && !isOpen) return null
+function CustomAlert({ isOpen, title, message, onConfirm, onCancel }) {
+  if (!isOpen) return null
 
   return (
-    <div className={`custom-alert ${isOpen ? "show" : ""}`} onClick={onCancel}>
-      <div className="alert-content" onClick={(e) => e.stopPropagation()}>
-        <h3 className="alert-title">{title}</h3>
-        <p className="alert-message">{message}</p>
-        <div className="alert-actions">
-          <button className="alert-cancel" onClick={onCancel}>
+    <div className="custom-alert-overlay" onClick={onCancel}>
+      <div className="custom-alert-container" onClick={(e) => e.stopPropagation()}>
+        <div className="custom-alert-header">
+          <h3 className="custom-alert-title">{title}</h3>
+        </div>
+        <div className="custom-alert-body">
+          <p className="custom-alert-message">{message}</p>
+        </div>
+        <div className="custom-alert-footer">
+          <button className="custom-alert-btn custom-alert-btn-cancel" onClick={onCancel}>
             취소
           </button>
-          <button className="alert-confirm" onClick={onConfirm}>
-            확인
+          <button className="custom-alert-btn custom-alert-btn-confirm" onClick={onConfirm}>
+            삭제
           </button>
         </div>
       </div>
     </div>
   )
 }
+
+export default CustomAlert

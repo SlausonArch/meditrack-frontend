@@ -1,3 +1,5 @@
+"use client"
+
 import { useEffect, useState, useRef } from "react"
 import "../styles/styles.css"
 import "../styles/interaction.css" // 스타일 파일 추가
@@ -17,6 +19,7 @@ function InteractionCheck() {
     setInteractionDrug,
     clearInteractionDrug,
     checkInteractions,
+    addMedication,
   } = useMedication()
 
   const [interactionResults, setInteractionResults] = useState(null)
@@ -133,6 +136,25 @@ function InteractionCheck() {
     } finally {
       setIsCheckingInteraction(false)
     }
+  }
+
+  // 대체 약품 추가 처리
+  const handleAddAlternative = (alternative) => {
+    // 이미 추가된 약품인지 확인
+    if (medications.some((med) => med.item_seq === alternative.item_seq)) {
+      return
+    }
+
+    // 약품 객체 구성
+    const medicationToAdd = {
+      item_seq: alternative.item_seq,
+      item_name: alternative.item_name,
+      entp_name: alternative.manufacturer,
+      // 필요한 경우 추가 필드 설정
+    }
+
+    // 약품 추가
+    addMedication(medicationToAdd)
   }
 
   // 디버깅용 로그
@@ -305,7 +327,15 @@ function InteractionCheck() {
                               <strong>주요 성분:</strong> {alternative.ingredient}
                             </p>
                           </div>
-                          <button className="btn text-btn">상세정보</button>
+                          <button
+                            className="btn primary-btn add-btn"
+                            onClick={() => handleAddAlternative(alternative)}
+                            disabled={medications.some((med) => med.item_seq === alternative.item_seq)}
+                          >
+                            {medications.some((med) => med.item_seq === alternative.item_seq)
+                              ? "추가됨"
+                              : "내 복용약에 추가"}
+                          </button>
                         </div>
                       ))}
                     </div>

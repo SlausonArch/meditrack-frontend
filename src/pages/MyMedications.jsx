@@ -1,9 +1,9 @@
 import { useEffect, useState, useRef } from "react"
+import { Link } from "react-router-dom"
 import "../styles/my-medications.css"
 import CustomAlert from "./custom-alert"
 import { useMedication } from "../context/medication-context"
-import { Search, Info, AlertTriangle, Clock } from 'lucide-react'
-import { Link } from "react-router-dom"
+import { Info, Clock } from "lucide-react"
 
 function MyMedications() {
   // 약품 관련 컨텍스트에서 가져오기
@@ -84,6 +84,18 @@ function MyMedications() {
   const handleCloseDetail = () => {
     setShowDetail(false)
   }
+
+  // 시간대별 복용 예정 약품 생성
+  const getScheduledMedications = (timeSlot) => {
+    return medications
+      .filter((med) => !med[timeSlot]) // 아직 복용하지 않은 약품만
+      .map((med) => med.item_name)
+      .slice(0, 3) // 최대 3개까지만 표시
+  }
+
+  const morningMeds = getScheduledMedications("morning")
+  const afternoonMeds = getScheduledMedications("afternoon")
+  const eveningMeds = getScheduledMedications("evening")
 
   return (
     <div className="dashboard-layout">
@@ -195,35 +207,41 @@ function MyMedications() {
               </Link>
             </div>
             <div className="card-body">
-              <div className="schedule-summary">
-                <div className="schedule-item">
-                  <div className="schedule-icon morning">
-                    <Clock size={20} />
+              {medications.length === 0 ? (
+                <div className="schedule-summary">
+                  <p className="no-data">등록된 복용약이 없습니다.</p>
+                </div>
+              ) : (
+                <div className="schedule-summary">
+                  <div className="schedule-item">
+                    <div className="schedule-icon morning">
+                      <Clock size={20} />
+                    </div>
+                    <div className="schedule-content">
+                      <h4>아침</h4>
+                      <p>{morningMeds.length > 0 ? morningMeds.join(", ") : "복용 완료"}</p>
+                    </div>
                   </div>
-                  <div className="schedule-content">
-                    <h4>아침</h4>
-                    <p>타이레놀, 비타민C</p>
+                  <div className="schedule-item">
+                    <div className="schedule-icon noon">
+                      <Clock size={20} />
+                    </div>
+                    <div className="schedule-content">
+                      <h4>점심</h4>
+                      <p>{afternoonMeds.length > 0 ? afternoonMeds.join(", ") : "복용 완료"}</p>
+                    </div>
+                  </div>
+                  <div className="schedule-item">
+                    <div className="schedule-icon evening">
+                      <Clock size={20} />
+                    </div>
+                    <div className="schedule-content">
+                      <h4>저녁</h4>
+                      <p>{eveningMeds.length > 0 ? eveningMeds.join(", ") : "복용 완료"}</p>
+                    </div>
                   </div>
                 </div>
-                <div className="schedule-item">
-                  <div className="schedule-icon noon">
-                    <Clock size={20} />
-                  </div>
-                  <div className="schedule-content">
-                    <h4>점심</h4>
-                    <p>아스피린</p>
-                  </div>
-                </div>
-                <div className="schedule-item">
-                  <div className="schedule-icon evening">
-                    <Clock size={20} />
-                  </div>
-                  <div className="schedule-content">
-                    <h4>저녁</h4>
-                    <p>타이레놀, 비타민D</p>
-                  </div>
-                </div>
-              </div>
+              )}
             </div>
           </div>
         </div>

@@ -16,7 +16,7 @@ export function useMedication() {
 // 프로바이더 컴포넌트
 export function MedicationProvider({ children }) {
   // 복용약 관련 상태
-  const [medications, setMedications] = useState([]) // 사용자의 현재 복용약 목록
+  const [medications, setMedications] = useState([]) // 사용자의 현재 복용약 목록 (morning, afternoon, evening 포함)
   const [searchKeyword, setSearchKeyword] = useState("") // 약물 검색어
   const [searchResults, setSearchResults] = useState([]) // 검색 결과
   const [isSearching, setIsSearching] = useState(false) // 검색 중 여부
@@ -30,9 +30,8 @@ export function MedicationProvider({ children }) {
     const token = localStorage.getItem("token")
     if (token) {
       api.defaults.headers.common["Authorization"] = `Bearer ${token}`
+      fetchMedications() // 토큰이 있을 때만 데이터 가져오기
     }
-
-    fetchMedications()
   }, [])
 
   // 검색어 입력 시 자동완성 결과 가져오기
@@ -55,11 +54,57 @@ export function MedicationProvider({ children }) {
     api
       .get("/user_health/drugs")
       .then((res) => {
-        console.log("복용약 목록:", res.data)
-        setMedications(res.data)
+        console.log("=== 백엔드 API 응답 분석 ===")
+        console.log("전체 응답:", res)
+        console.log("응답 데이터:", res.data)
+        console.log("데이터 타입:", typeof res.data)
+        console.log("배열인가?", Array.isArray(res.data))
+
+        if (res.data && res.data.length > 0) {
+          console.log("첫 번째 약물 데이터:", res.data[0])
+          console.log("첫 번째 약물의 키들:", Object.keys(res.data[0]))
+
+          // 각 약물의 시간대 필드 확인
+          res.data.forEach((medication, index) => {
+            console.log(`약물 ${index + 1} (${medication.item_name || "Unknown"}):`)
+            console.log(`  - morning: ${medication.morning} (타입: ${typeof medication.morning})`)
+            console.log(`  - afternoon: ${medication.afternoon} (타입: ${typeof medication.afternoon})`)
+            console.log(`  - evening: ${medication.evening} (타입: ${typeof medication.evening})`)
+            console.log(`  - 전체 객체:`, medication)
+          })
+        }
+
+        // 백엔드에서 받은 데이터가 morning, afternoon, evening 필드를 포함하는지 확인
+        const medicationsWithSchedule = res.data.map((medication) => {
+          // 시간대 필드가 없거나 undefined인 경우 기본값 false 설정
+          const processedMedication = {
+            ...medication,
+            morning: medication.morning !== undefined ? Boolean(medication.morning) : false,
+            afternoon: medication.afternoon !== undefined ? Boolean(medication.afternoon) : false,
+            evening: medication.evening !== undefined ? Boolean(medication.evening) : false,
+          }
+
+          console.log(`처리된 약물 ${processedMedication.item_name}:`, {
+            original_morning: medication.morning,
+            processed_morning: processedMedication.morning,
+            original_afternoon: medication.afternoon,
+            processed_afternoon: processedMedication.afternoon,
+            original_evening: medication.evening,
+            processed_evening: processedMedication.evening,
+          })
+
+          return processedMedication
+        })
+
+        console.log("최종 처리된 복용약 목록:", medicationsWithSchedule)
+        setMedications(medicationsWithSchedule)
       })
       .catch((err) => {
-        console.error("복용약 불러오기 실패:", err.response ? err.response.data : err)
+        console.error("복용약 불러오기 실패:", err)
+        if (err.response) {
+          console.error("응답 상태:", err.response.status)
+          console.error("응답 데이터:", err.response.data)
+        }
       })
       .finally(() => {
         setIsLoading(false)
@@ -106,8 +151,17 @@ export function MedicationProvider({ children }) {
         // 필요한 경우 UI 표시용 데이터도 함께 전송
         item_name: medication.item_name,
       })
-      .then(() => {
-        setMedications((prev) => [...prev, medication])
+      .then((response) => {
+        console.log("약물 추가 응답:", response.data)
+
+        // 새로 추가된 약품은 기본적으로 모든 시간대가 false
+        const newMedication = {
+          ...medication,
+          morning: false,
+          afternoon: false,
+          evening: false,
+        }
+        setMedications((prev) => [...prev, newMedication])
         setSearchKeyword("")
         setShowSearchResults(false)
       })
@@ -133,6 +187,69 @@ export function MedicationProvider({ children }) {
       .finally(() => {
         setIsLoading(false)
       })
+  }
+
+  // 복용 상태 업데이트
+  const updateMedicationSchedule = (medicationId, timeSlot, status) => {
+    console.log(`=== 복용 상태 업데이트 시작 ===`)
+    console.log(`약물 ID: ${medicationId}`)
+    console.log(`시간대: ${timeSlot}`)
+    console.log(`상태: ${status}`)
+
+    setIsLoading(true)
+
+    const updateData = {
+      [timeSlot]: status,
+    }
+
+    console.log("전송할 데이터:", updateData)
+
+    api
+      .patch(`/user_health/drugs/${medicationId}`, updateData)
+      .then((response) => {
+        console.log("PATCH 응답:", response.data)
+
+        // 로컬 상태 업데이트
+        setMedications((prev) =>
+          prev.map((med) => {
+            if (med.item_seq === medicationId) {
+              const updatedMed = { ...med, [timeSlot]: status }
+              console.log(`약물 ${med.item_name} 상태 업데이트:`, updatedMed)
+              return updatedMed
+            }
+            return med
+          }),
+        )
+        console.log(`약품 ${medicationId}의 ${timeSlot} 상태가 ${status}로 업데이트됨`)
+      })
+      .catch((err) => {
+        console.error("복용 상태 업데이트 실패:", err)
+        if (err.response) {
+          console.error("응답 상태:", err.response.status)
+          console.error("응답 데이터:", err.response.data)
+        }
+        // 에러 발생 시 사용자에게 알림
+        throw new Error("복용 상태 업데이트에 실패했습니다.")
+      })
+      .finally(() => {
+        setIsLoading(false)
+      })
+  }
+
+  // 오늘의 진행률 계산
+  const getTodayProgress = () => {
+    if (medications.length === 0) return { completed: 0, total: 0, percentage: 0 }
+
+    const totalSlots = medications.length * 3 // 각 약품당 3개 시간대
+    const completedSlots = medications.reduce((acc, med) => {
+      return acc + (med.morning ? 1 : 0) + (med.afternoon ? 1 : 0) + (med.evening ? 1 : 0)
+    }, 0)
+
+    return {
+      completed: completedSlots,
+      total: totalSlots,
+      percentage: totalSlots > 0 ? Math.round((completedSlots / totalSlots) * 100) : 0,
+    }
   }
 
   // 상호작용 확인용 약품 설정
@@ -226,6 +343,8 @@ export function MedicationProvider({ children }) {
     searchMedications,
     addMedication,
     deleteMedication,
+    updateMedicationSchedule,
+    getTodayProgress,
     setInteractionDrug,
     clearInteractionDrug,
     checkInteractions,

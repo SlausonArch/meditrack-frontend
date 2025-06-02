@@ -3,12 +3,16 @@
   display: flex;
   flex-direction: column;
   gap: 24px;
+  /* 검색 드롭다운을 위해 overflow 허용 */
+  overflow: visible;
 }
 
 .form-section {
   background-color: #f8fafc;
   border-radius: 8px;
   padding: 16px;
+  /* 검색 드롭다운을 위해 overflow 허용 */
+  overflow: visible;
 }
 
 .form-section h4 {
@@ -49,6 +53,8 @@
 .search-container {
   position: relative;
   width: 100%;
+  /* 검색 결과가 표시될 수 있도록 overflow 허용 */
+  overflow: visible;
 }
 
 .search-input {
@@ -312,4 +318,65 @@
   color: #64748b;
   font-size: 0.9375rem;
   font-style: italic;
+}
+
+/* 대체 약품 추가 버튼 스타일 */
+.add-btn {
+  padding: 6px 12px;
+  font-size: 0.875rem;
+  border-radius: 6px;
+  background-color: #0284c7;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.add-btn:hover {
+  background-color: #0369a1;
+}
+
+.add-btn:disabled {
+  background-color: #94a3b8;
+  cursor: not-allowed;
+}
+
+.alternative-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background-color: #f8fafc;
+  border-radius: 8px;
+}
+
+.alternative-info {
+  flex: 1;
+}
+
+/* 카드 스타일에서 검색이 포함된 경우 overflow 허용 */
+.card {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  /* overflow: hidden; 제거하거나 조건부 적용 */
+}
+
+.card-body {
+  padding: 20px;
+  /* 검색 관련 컨텐츠가 있는 경우 overflow 허용 */
+  overflow: visible;
+}
+
+/* 검색 결과 드롭다운이 카드 경계를 넘어서 표시되도록 */
+.card:has(.search-container) {
+  overflow: visible;
+}
+
+.card:has(.interaction-form) {
+  overflow: visible;
+}
+
+.card:has(.interaction-form) .card-body {
+  overflow: visible;
 }

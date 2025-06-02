@@ -16,7 +16,7 @@ function Sidebar() {
       </div>
       <div className="user-profile">
         <div className="user-avatar">
-          <img src="https://placehold.co/100" alt="사용자 프로필" />
+          <img src="https://img1.daumcdn.net/thumb/R1280x0/?fname=http://t1.daumcdn.net/brunch/service/user/7r5X/image/9djEiPBPMLu_IvCYyvRPwmZkM1g.jpg" alt="사용자 프로필" />
         </div>
         <h3 className="user-name">{userName}님</h3>
         <p className="user-email">{userEmail}</p>
@@ -28,7 +28,7 @@ function Sidebar() {
           <li><a href="/medication-reminders"><i className="fas fa-bell"></i> 복용 알림</a></li>
           <li><a href="/mypage"><i className="fas fa-user"></i> 내 정보</a></li>
           <li><a href="/symptom-search"><i className="fas fa-search"></i> 증상 검색</a></li>
-          <li><a href="/otc-meds"><i className="fas fa-first-aid"></i> 상비약 구비</a></li>
+          {/* <li><a href="/otc-meds"><i className="fas fa-first-aid"></i> 상비약 구비</a></li> */}
           <li><a href="/interaction-check"><i className="fas fa-exchange-alt"></i> 상호작용 확인</a></li>
           <li><a href="/lens"><i className="fas fa-camera"></i> 약품 스캔</a></li>
           <li><a href="/"><i className="fas fa-sign-out-alt"></i> 로그아웃</a></li>

@@ -10,7 +10,7 @@
   background-color: white;
   border-radius: 8px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  overflow: visible;
+  /* overflow: hidden; 제거 */
 }
 
 .card-header {
@@ -39,6 +39,8 @@
 
 .card-body {
   padding: 20px;
+  /* 검색이 포함된 카드에서는 overflow 허용 */
+  overflow: visible;
 }
 
 .card-actions {
@@ -49,12 +51,15 @@
 /* 약품 검색 스타일 */
 .medication-search {
   width: 100%;
+  position: relative; /* 추가 */
 }
 
 .search-container {
   position: relative;
   width: 100%;
   margin-bottom: 8px;
+  /* 검색 결과가 표시될 수 있도록 overflow 허용 */
+  overflow: visible;
 }
 
 .search-input {
@@ -203,17 +208,44 @@
   justify-content: center;
   background-color: transparent;
   color: #64748b;
+  border: 1px solid transparent;
   border-radius: 50%;
-  transition: background-color 0.2s, color 0.2s;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 14px;
 }
 
 .icon-btn:hover {
   background-color: #f1f5f9;
   color: #0284c7;
+  border-color: #e2e8f0;
+}
+
+.icon-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.icon-btn:disabled:hover {
+  background-color: transparent;
+  color: #64748b;
+  border-color: transparent;
+}
+
+.delete-btn {
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
 }
 
 .delete-btn:hover {
-  color: #dc2626;
+  background-color: #fef2f2 !important;
+  color: #dc2626 !important;
+  border-color: #fecaca;
+}
+
+.delete-btn:active {
+  background-color: #fee2e2;
+  transform: scale(0.95);
 }
 
 /* 복용 일정 스타일 */
@@ -399,4 +431,137 @@
 
 .outline-btn:hover {
   background-color: #f0f9ff;
+}
+
+/* CustomAlert 스타일 */
+.custom-alert-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.custom-alert-container {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  max-width: 400px;
+  width: 90%;
+  overflow: hidden;
+  animation: slideIn 0.3s ease-out;
+}
+
+.custom-alert-header {
+  padding: 20px 20px 10px 20px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.custom-alert-title {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #334155;
+}
+
+.custom-alert-body {
+  padding: 15px 20px 20px 20px;
+}
+
+.custom-alert-message {
+  margin: 0;
+  color: #64748b;
+  line-height: 1.5;
+}
+
+.custom-alert-footer {
+  padding: 15px 20px 20px 20px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.custom-alert-btn {
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  min-width: 70px;
+}
+
+.custom-alert-btn-cancel {
+  background-color: #f8fafc;
+  color: #64748b;
+  border: 1px solid #e2e8f0;
+}
+
+.custom-alert-btn-cancel:hover {
+  background-color: #f1f5f9;
+  color: #475569;
+}
+
+.custom-alert-btn-confirm {
+  background-color: #dc2626;
+  color: white;
+}
+
+.custom-alert-btn-confirm:hover {
+  background-color: #b91c1c;
+}
+
+.custom-alert-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* 기존 모달과의 z-index 충돌 방지 */
+.custom-alert-overlay {
+  z-index: 10000 !important;
+}
+
+/* 검색 결과가 카드 경계를 넘어서 표시될 수 있도록 */
+.card:has(.medication-search) {
+  overflow: visible;
+}
+
+/* 대안으로 medication-search를 포함한 카드만 따로 스타일링 */
+.search-card {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  overflow: visible; /* 검색 드롭다운을 위해 overflow 허용 */
+}
+
+.search-card .card-body {
+  padding: 20px;
+  overflow: visible;
 }

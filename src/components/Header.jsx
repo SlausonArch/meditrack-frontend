@@ -45,8 +45,9 @@ function Header() {
         <nav>
           <ul className="nav-links">
             <li><a href="/">홈</a></li>
+            <li><a href="/dashboard">대시보드</a></li>
+            <li><a href="/my-medications">내 약품 관리</a></li>
             <li><a href="/symptom-search">증상 검색</a></li>
-            <li><a href="/otc-meds">상비약 구비</a></li>
             <li><a href="/interaction-check">상호작용 확인</a></li>
             <li><a href="/lens">약품 스캔</a></li>
           </ul>

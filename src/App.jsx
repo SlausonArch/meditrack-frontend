@@ -13,10 +13,10 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Dashboard from './pages/Dashboard';
 import SymptomPage from './pages/SymptomPage'; // 추가된 import
 import { MedicationProvider } from './context/medication-context';
-
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import { SymptomProvider } from './context/symptom-context'; // 경로 수정
 import MyMedications from './pages/MyMedications';
+import MedicationReminders from './pages/medication-reminders';
 
 function App() {
   return (
@@ -90,6 +90,16 @@ function App() {
             <ProtectedRoute>
               <MedicationProvider>
                 <SidebarLayout><MyMedications /></SidebarLayout>
+              </MedicationProvider>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/medication-reminders"
+          element={
+            <ProtectedRoute>
+              <MedicationProvider>
+                <SidebarLayout><MedicationReminders /></SidebarLayout>
               </MedicationProvider>
             </ProtectedRoute>
           }

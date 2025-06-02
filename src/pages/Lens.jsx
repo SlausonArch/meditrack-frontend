@@ -1,6 +1,8 @@
+"use client"
+
 import { useEffect, useState, useRef } from "react"
 import "../styles/lens.css"
-import { Search, Upload, Camera, Clipboard, ImageIcon } from "lucide-react"
+import { Search, Upload, Camera, Clipboard, ImageIcon, Check, X } from 'lucide-react'
 import { useMedication } from "../context/medication-context"
 import { useMobile } from "../hooks/use-mobile"
 
@@ -14,6 +16,9 @@ function Lens() {
   const [selectedMedication, setSelectedMedication] = useState(null)
   const [showDetail, setShowDetail] = useState(false)
 
+  // 토스트 알림 상태
+  const [toasts, setToasts] = useState([])
+
   // 이미지 업로드 및 스캔 관련 상태
   const [selectedImage, setSelectedImage] = useState(null)
   const [previewUrl, setPreviewUrl] = useState(null)
@@ -24,6 +29,23 @@ function Lens() {
   const fileInputRef = useRef(null)
   const cameraInputRef = useRef(null)
   const scanPreviewRef = useRef(null)
+
+  // 토스트 알림 추가 함수
+  const addToast = (message, type = "success") => {
+    const id = Date.now()
+    const newToast = { id, message, type }
+    setToasts((prev) => [...prev, newToast])
+
+    // 3초 후 자동 제거
+    setTimeout(() => {
+      removeToast(id)
+    }, 3000)
+  }
+
+  // 토스트 알림 제거 함수
+  const removeToast = (id) => {
+    setToasts((prev) => prev.filter((toast) => toast.id !== id))
+  }
 
   useEffect(() => {
     // 이미지 선택 취소 시 미리보기 초기화
@@ -144,7 +166,7 @@ function Lens() {
   const handlePasteClick = () => {
     // 스캔 미리보기 영역에 포커스를 주어 붙여넣기 이벤트를 받을 수 있게 함
     scanPreviewRef.current.focus()
-    alert("Ctrl+V를 눌러 클립보드의 이미지를 붙여넣으세요.")
+    addToast("Ctrl+V를 눌러 클립보드의 이미지를 붙여넣으세요.", "info")
   }
 
   // 이미지 스캔 처리 함수
@@ -198,19 +220,26 @@ function Lens() {
         setScanError("이미지에서 약품을 인식할 수 없습니다. 다른 이미지를 시도해보세요.")
       } else {
         setScanResults(data)
+        addToast(`${data.length}개의 약품을 인식했습니다.`, "success")
       }
     } catch (error) {
       console.error("이미지 스캔 실패:", error)
       setScanError(error.message || "이미지 스캔 중 오류가 발생했습니다.")
+      addToast("이미지 스캔에 실패했습니다.", "error")
     } finally {
       setIsScanning(false)
     }
   }
 
-  // 복용약 추가 핸들러
-  const handleAddMedication = (medication) => {
-    addMedication(medication)
-    alert(`${medication.item_name}이(가) 복용약에 추가되었습니다.`)
+  // 복용약 추가 핸들러 (개선된 버전)
+  const handleAddMedication = async (medication) => {
+    try {
+      await addMedication(medication)
+      addToast(`${medication.item_name}이(가) 복용약에 추가되었습니다.`, "success")
+    } catch (error) {
+      console.error("약품 추가 실패:", error)
+      addToast("약품 추가에 실패했습니다. 다시 시도해주세요.", "error")
+    }
   }
 
   const handleShowDetail = (medication) => {
@@ -241,36 +270,6 @@ function Lens() {
         </header>
 
         <div className="content-body">
-          {/* 검색 카드 ---> 쓸지 안쓸지 몰라서 비활성화 */}
-          {/* <div className="card">
-            <div className="card-header">
-              <h3>약품 검색</h3>
-            </div>
-            <div className="card-body">
-              <div className="search-container">
-                <div className="search-input-wrapper">
-                  <input
-                    type="text"
-                    className="search-input"
-                    placeholder="약품 이름을 입력하세요"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    onKeyPress={(e) => e.key === "Enter" && searchMedication()}
-                  />
-                  <button className="search-button" onClick={searchMedication} disabled={isSearching}>
-                    <Search size={18} />
-                    <span>검색</span>
-                  </button>
-                </div>
-                <div className="search-options">
-                  <span className="search-option active">약품명</span>
-                  <span className="search-option">제조사</span>
-                  <span className="search-option">효능</span>
-                </div>
-              </div>
-            </div>
-          </div> */}
-
           {/* 카메라 스캔 카드 */}
           <div className="card">
             <div className="card-header">
@@ -293,7 +292,7 @@ function Lens() {
                 )}
               </div>
               <div className="scan-instruction">
-                <p>약품의 포장이나 라벨 이미지를 업로드하세요.</p>
+                <p>처방전이나 약 봉투 이미지를 업로드 하세요.</p>
                 <div className="scan-actions">
                   {/* 일반 파일 업로드 (PC/모바일 공통) */}
                   <input
@@ -474,7 +473,9 @@ function Lens() {
               </div>
             </div>
             <div className="modal-footer">
-              <button className="btn primary-btn">복용 추가</button>
+              <button className="btn primary-btn" onClick={() => handleAddMedication(selectedMedication)}>
+                복용 추가
+              </button>
               <button className="btn outline-btn" onClick={handleCloseDetail}>
                 닫기
               </button>
@@ -482,6 +483,23 @@ function Lens() {
           </div>
         </div>
       )}
+
+      {/* 토스트 알림 */}
+      <div className="toast-container">
+        {toasts.map((toast) => (
+          <div key={toast.id} className={`toast toast-${toast.type}`}>
+            <div className="toast-icon">
+              {toast.type === "success" && <Check size={20} />}
+              {toast.type === "error" && <X size={20} />}
+              {toast.type === "info" && <i className="fas fa-info-circle"></i>}
+            </div>
+            <span className="toast-message">{toast.message}</span>
+            <button className="toast-close" onClick={() => removeToast(toast.id)}>
+              <X size={16} />
+            </button>
+          </div>
+        ))}
+      </div>
     </div>
   )
 }
