@@ -90,7 +90,7 @@ function Login() {
               </div>
             </div>
             <div className="auth-image">
-              <img src="https://placehold.co/500x600" alt="로그인 이미지" />
+              <img src="https://i.ibb.co/FkYGQFvy/image.jpg" alt="로그인 이미지" />
             </div>
           </div>
         </div>

@@ -1,9 +1,11 @@
+"use client"
+
 import { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
 import api from "../api"
 import "../styles/dashboard.css"
 import CustomAlert from "./custom-alert"
-import { Pill, AlertTriangle, Info } from "lucide-react"
+import { Pill, AlertTriangle, Heart } from 'lucide-react'
 import { useMedication } from "../context/medication-context"
 
 function Dashboard() {
@@ -14,12 +16,6 @@ function Dashboard() {
 
   // 복용약 관련 상태 (컨텍스트에서 가져오기)
   const { medications } = useMedication()
-
-  // 약물 상세 정보 상태
-  const [medicationDetails, setMedicationDetails] = useState([])
-  const [isLoadingDetails, setIsLoadingDetails] = useState(false)
-  const [selectedMedicationDetail, setSelectedMedicationDetail] = useState(null)
-  const [showDetailModal, setShowDetailModal] = useState(false)
 
   // 실제 상호작용 경고 상태
   const [interactionWarnings, setInteractionWarnings] = useState([])
@@ -40,69 +36,14 @@ function Dashboard() {
     fetchDiseases()
   }, [])
 
-  // 복용약이 변경될 때마다 상호작용 확인 및 약물 상세 정보 가져오기
+  // 복용약이 변경될 때마다 상호작용 확인
   useEffect(() => {
     if (medications.length >= 2) {
       checkMedicationInteractions()
     } else {
       setInteractionWarnings([])
     }
-
-    // 약물 상세 정보 가져오기
-    if (medications.length > 0) {
-      fetchMedicationDetails()
-    } else {
-      setMedicationDetails([])
-    }
   }, [medications])
-
-  // 약물 상세 정보 가져오기
-  const fetchMedicationDetails = async () => {
-    if (medications.length === 0) return
-
-    setIsLoadingDetails(true)
-
-    try {
-      const token = localStorage.getItem("token")
-      if (!token) {
-        console.error("인증 토큰이 없습니다.")
-        return
-      }
-
-      const detailPromises = medications.map(async (medication) => {
-        try {
-          const response = await api.get(`/drug_info/search?query=${encodeURIComponent(medication.item_name)}`)
-
-          // 검색 결과에서 가장 일치하는 약물 찾기 (첫 번째 결과 사용)
-          if (response.data && response.data.length > 0) {
-            return {
-              ...medication,
-              details: response.data[0], // 첫 번째 검색 결과 사용
-            }
-          } else {
-            return {
-              ...medication,
-              details: null,
-            }
-          }
-        } catch (error) {
-          console.error(`${medication.item_name} 상세 정보 가져오기 실패:`, error)
-          return {
-            ...medication,
-            details: null,
-          }
-        }
-      })
-
-      const results = await Promise.all(detailPromises)
-      console.log("약물 상세 정보:", results)
-      setMedicationDetails(results)
-    } catch (error) {
-      console.error("약물 상세 정보 가져오기 실패:", error)
-    } finally {
-      setIsLoadingDetails(false)
-    }
-  }
 
   // 복용약 간 상호작용 확인 함수
   const checkMedicationInteractions = async () => {
@@ -139,7 +80,6 @@ function Dashboard() {
               },
               body: JSON.stringify({
                 new_medication_id: med2.item_seq,
-                // 기존 복용약 중에서 med1만 고려하도록 필터링이 필요할 수 있음
               }),
             })
 
@@ -288,18 +228,6 @@ function Dashboard() {
     }
   }
 
-  // 약물 상세 정보 모달 열기
-  const handleShowMedicationDetail = (medicationDetail) => {
-    setSelectedMedicationDetail(medicationDetail)
-    setShowDetailModal(true)
-  }
-
-  // 약물 상세 정보 모달 닫기
-  const handleCloseDetailModal = () => {
-    setShowDetailModal(false)
-    setSelectedMedicationDetail(null)
-  }
-
   return (
     <div className="dashboard-layout">
       <main className="main-content">
@@ -328,17 +256,15 @@ function Dashboard() {
 
             <div className="summary-card">
               <div className="summary-icon">
-                <Info size={24} />
+                <Heart size={24} />
               </div>
               <div className="summary-content">
-                <h4>약물 정보</h4>
-                <p className="summary-value">
-                  {isLoadingDetails ? "로딩 중..." : `${medicationDetails.filter((m) => m.details).length}개 조회됨`}
-                </p>
+                <h4>기저질환</h4>
+                <p className="summary-value">{diseases.length}개</p>
               </div>
-              <Link to="/lens" className="summary-link">
-                약품 검색
-              </Link>
+              <button className="summary-link" onClick={handleAddConditions}>
+                관리하기
+              </button>
             </div>
 
             <div className="summary-card">
@@ -417,66 +343,24 @@ function Dashboard() {
             </div>
           </div>
 
-          {/* 현재 복용 중인 약물 정보 섹션 */}
+          {/* 현재 복용 중인 약물 목록 섹션 */}
           <div className="card">
             <div className="card-header">
-              <h3>현재 복용 중인 약물 정보</h3>
+              <h3>현재 복용 중인 약물</h3>
               <Link to="/my-medications" className="card-link">
                 약물 관리
               </Link>
             </div>
             <div className="card-body">
-              {isLoadingDetails ? (
-                <div className="loading-state">
-                  <span className="loading-spinner"></span>
-                  <p>약물 정보를 불러오는 중...</p>
-                </div>
-              ) : medicationDetails.length === 0 ? (
+              {medications.length === 0 ? (
                 <p className="no-data">등록된 복용약이 없습니다.</p>
               ) : (
-                <div className="medication-details-list">
-                  {medicationDetails.map((medicationDetail) => (
-                    <div className="medication-detail-card" key={medicationDetail.item_seq}>
-                      <div className="medication-image">
-                        {medicationDetail.details?.image ? (
-                          <img
-                            src={medicationDetail.details.image || "/placeholder.svg"}
-                            alt={medicationDetail.item_name}
-                            onError={(e) => {
-                              e.target.src = "/placeholder.svg?height=80&width=80"
-                            }}
-                          />
-                        ) : (
-                          <div className="no-image">
-                            <Pill size={32} />
-                          </div>
-                        )}
-                      </div>
+                <div className="simple-medication-list">
+                  {medications.map((medication) => (
+                    <div className="simple-medication-item" key={medication.item_seq}>
                       <div className="medication-info">
-                        <h4>{medicationDetail.item_name}</h4>
-                        <p className="manufacturer">{medicationDetail.entp_name}</p>
-                        {medicationDetail.details ? (
-                          <div className="medication-summary">
-                            <p className="efficacy">
-                              <strong>효능:</strong> {medicationDetail.details.efficacy?.substring(0, 100)}...
-                            </p>
-                            <p className="warning">
-                              <strong>주의사항:</strong> {medicationDetail.details.warning?.substring(0, 80)}...
-                            </p>
-                          </div>
-                        ) : (
-                          <p className="no-details">상세 정보를 불러올 수 없습니다.</p>
-                        )}
-                      </div>
-                      <div className="medication-actions">
-                        {medicationDetail.details && (
-                          <button
-                            className="btn primary-btn small-btn"
-                            onClick={() => handleShowMedicationDetail(medicationDetail)}
-                          >
-                            상세보기
-                          </button>
-                        )}
+                        <h4>{medication.item_name}</h4>
+                        <p className="manufacturer">{medication.entp_name}</p>
                       </div>
                     </div>
                   ))}
@@ -527,74 +411,6 @@ function Dashboard() {
           )}
         </div>
       </main>
-
-      {/* 약물 상세 정보 모달 */}
-      {showDetailModal && selectedMedicationDetail && selectedMedicationDetail.details && (
-        <div className="modal-overlay">
-          <div className="modal-container">
-            <div className="modal-header">
-              <h3>{selectedMedicationDetail.details.product_name}</h3>
-              <button className="modal-close" onClick={handleCloseDetailModal}>
-                ×
-              </button>
-            </div>
-            <div className="modal-body">
-              <div className="medication-detail">
-                {selectedMedicationDetail.details.image && (
-                  <div className="medication-detail-image">
-                    <img
-                      src={selectedMedicationDetail.details.image || "/placeholder.svg"}
-                      alt={selectedMedicationDetail.details.product_name}
-                      onError={(e) => {
-                        e.target.src = "/placeholder.svg?height=200&width=200"
-                      }}
-                    />
-                  </div>
-                )}
-                <div className="medication-detail-info">
-                  <div className="detail-section">
-                    <h4>제조사</h4>
-                    <p>{selectedMedicationDetail.details.manufacturer}</p>
-                  </div>
-                  <div className="detail-section">
-                    <h4>효능·효과</h4>
-                    <p>{selectedMedicationDetail.details.efficacy}</p>
-                  </div>
-                  <div className="detail-section">
-                    <h4>용법·용량</h4>
-                    <p>{selectedMedicationDetail.details.use_method}</p>
-                  </div>
-                  <div className="detail-section">
-                    <h4>경고</h4>
-                    <p>{selectedMedicationDetail.details.warning}</p>
-                  </div>
-                  <div className="detail-section">
-                    <h4>주의사항</h4>
-                    <p>{selectedMedicationDetail.details.caution}</p>
-                  </div>
-                  <div className="detail-section">
-                    <h4>상호작용</h4>
-                    <p>{selectedMedicationDetail.details.interaction}</p>
-                  </div>
-                  <div className="detail-section">
-                    <h4>부작용</h4>
-                    <p>{selectedMedicationDetail.details.side_effect}</p>
-                  </div>
-                  <div className="detail-section">
-                    <h4>보관방법</h4>
-                    <p>{selectedMedicationDetail.details.storage_method}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="modal-footer">
-              <button className="btn outline-btn" onClick={handleCloseDetailModal}>
-                닫기
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* 커스텀 알림창 */}
       <CustomAlert

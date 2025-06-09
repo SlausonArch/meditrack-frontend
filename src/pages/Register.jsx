@@ -150,7 +150,7 @@ function Register() {
               </div>
             </div>
             <div className="auth-image">
-              <img src="https://placehold.co/500x600" alt="회원가입 이미지" />
+              <img src="https://i.ibb.co/qM52XS6D/image.jpg" alt="회원가입 이미지" />
             </div>
           </div>
         </div>
