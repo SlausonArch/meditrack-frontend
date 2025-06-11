@@ -1,5 +1,3 @@
-"use client"
-
 import { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
 import api from "../api"
@@ -249,7 +247,7 @@ function Dashboard() {
                 <h4>복용약</h4>
                 <p className="summary-value">{medications.length}개</p>
               </div>
-              <Link to="/my-medications" className="summary-link">
+              <Link to="/my-medications" className="summary-action-btn">
                 자세히 보기
               </Link>
             </div>
@@ -262,7 +260,7 @@ function Dashboard() {
                 <h4>기저질환</h4>
                 <p className="summary-value">{diseases.length}개</p>
               </div>
-              <button className="summary-link" onClick={handleAddConditions}>
+              <button className="summary-action-btn" onClick={handleAddConditions}>
                 관리하기
               </button>
             </div>
@@ -277,7 +275,7 @@ function Dashboard() {
                   {isCheckingInteractions ? "확인 중..." : `${interactionWarnings.length}개 주의`}
                 </p>
               </div>
-              <Link to="/interaction-check" className="summary-link">
+              <Link to="/interaction-check" className="summary-action-btn">
                 자세히 보기
               </Link>
             </div>

@@ -59,14 +59,33 @@
   color: #334155;
 }
 
-.summary-link {
-  color: #0284c7;
+/* 통일된 요약 카드 액션 버튼 스타일 */
+.summary-action-btn {
+  background-color: #0284c7;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 4px;
   font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
   text-decoration: none;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 70px;
+  font-family: inherit;
 }
 
-.summary-link:hover {
-  text-decoration: underline;
+.summary-action-btn:hover {
+  background-color: #0369a1;
+  text-decoration: none;
+  transform: translateY(-1px);
+}
+
+.summary-action-btn:active {
+  background-color: #075985;
+  transform: translateY(0);
 }
 
 /* 카드 스타일 */
